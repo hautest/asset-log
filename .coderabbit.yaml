@@ -1,0 +1,39 @@
+language: ko
+early_access: false
+reviews:
+  profile: chill
+  request_changes_workflow: false
+  high_level_summary: true
+  poem: false
+  review_status: true
+  collapse_walkthrough: false
+  auto_review:
+    enabled: true
+    drafts: false
+  path_instructions:
+    - path: "**/*.{ts,tsx}"
+      instructions: |
+        리뷰는 반드시 한국어로 작성해주세요.
+        - CLAUDE.md의 코딩 컨벤션을 준수하는지 확인해주세요
+        - TypeScript 타입 안정성을 검토해주세요
+        - any 타입 사용을 지적해주세요
+        - 추상화를 고려해 코드의 재사용성과 코드 퀄리티를 확인해주세요
+    - path: "src/shared/db/schema/**"
+      instructions: |
+        리뷰는 반드시 한국어로 작성해주세요.
+        - Drizzle ORM 스키마 작성 규칙을 준수하는지 확인해주세요
+        - 데이터베이스 인덱스가 적절히 설정되었는지 검토해주세요
+chat:
+  auto_reply: true
+knowledge_base:
+  learnings:
+    scope: auto
+  opt_out: false
+  issues:
+    scope: auto
+  jira:
+    usage: disabled
+  linear:
+    usage: disabled
+  pull_requests:
+    scope: auto
