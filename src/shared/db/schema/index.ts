@@ -5,6 +5,7 @@ import {
   timestamp,
   boolean,
   index,
+  uniqueIndex,
   pgEnum,
   bigint,
 } from "drizzle-orm/pg-core";
@@ -81,13 +82,6 @@ export const verification = pgTable(
   (table) => [index("verification_identifier_idx").on(table.identifier)]
 );
 
-export const userRelations = relations(user, ({ many }) => ({
-  sessions: many(session),
-  accounts: many(account),
-  categories: many(category),
-  monthlySnapshots: many(monthlySnapshot),
-}));
-
 export const sessionRelations = relations(session, ({ one }) => ({
   user: one(user, {
     fields: [session.userId],
@@ -138,7 +132,9 @@ export const monthlySnapshot = pgTable(
       .notNull()
       .references(() => user.id, { onDelete: "cascade" }),
     yearMonth: text("year_month").notNull(), // 'YYYY-MM' format
-    totalAmount: bigint("total_amount", { mode: "number" }).default(0).notNull(),
+    totalAmount: bigint("total_amount", { mode: "number" })
+      .default(0)
+      .notNull(),
     memo: text("memo"),
     status: snapshotStatusEnum("status").default("empty").notNull(),
     createdAt: timestamp("created_at").defaultNow().notNull(),
@@ -149,7 +145,10 @@ export const monthlySnapshot = pgTable(
   },
   (table) => [
     index("monthlySnapshot_userId_idx").on(table.userId),
-    index("monthlySnapshot_userId_yearMonth_idx").on(table.userId, table.yearMonth),
+    uniqueIndex("monthlySnapshot_userId_yearMonth_unique").on(
+      table.userId,
+      table.yearMonth
+    ),
   ]
 );
 
@@ -207,4 +206,11 @@ export const assetRelations = relations(asset, ({ one }) => ({
     fields: [asset.categoryId],
     references: [category.id],
   }),
+}));
+
+export const userRelations = relations(user, ({ many }) => ({
+  sessions: many(session),
+  accounts: many(account),
+  categories: many(category),
+  monthlySnapshots: many(monthlySnapshot),
 }));
