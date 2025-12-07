@@ -142,6 +142,7 @@ export function AssetForm({ onSubmit }: AssetFormProps) {
 
 - Tailwind CSS만 사용
 - 인라인 스타일 금지(단, 정적 분석이 불가능한 스타일은 인라인 스타일 허용)
+- 반응형으로 구성하며, 모바일 뷰도 대응해야한다.
 
 ---
 
@@ -159,6 +160,7 @@ export function AssetForm({ onSubmit }: AssetFormProps) {
 - 에러 처리 필수
 - 새 기능 추가 시 기존 패턴 따르기
 - 커밋 전 lint/type 체크
+- ui는 shadcn ui를 최우선으로 사용하고 없으면 설치 명령어로 설치하여 사용 shadcn자체에 ui가 없을때만 직접 만들어서 사용
 
 ---
 
