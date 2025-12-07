@@ -23,11 +23,3 @@ reviews:
         - 데이터베이스 인덱스가 적절히 설정되었는지 검토해주세요
 chat:
   auto_reply: true
-knowledge_base:
-  learnings:
-    scope: auto
-  opt_out: false
-  issues: true
-  jira: false
-  linear: false
-  pull_requests: true
