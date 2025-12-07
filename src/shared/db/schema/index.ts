@@ -1,5 +1,13 @@
 import { relations } from "drizzle-orm";
-import { pgTable, text, timestamp, boolean, index } from "drizzle-orm/pg-core";
+import {
+  pgTable,
+  text,
+  timestamp,
+  boolean,
+  index,
+  pgEnum,
+  bigint,
+} from "drizzle-orm/pg-core";
 
 export const user = pgTable("user", {
   id: text("id").primaryKey(),
@@ -76,6 +84,8 @@ export const verification = pgTable(
 export const userRelations = relations(user, ({ many }) => ({
   sessions: many(session),
   accounts: many(account),
+  categories: many(category),
+  monthlySnapshots: many(monthlySnapshot),
 }));
 
 export const sessionRelations = relations(session, ({ one }) => ({
@@ -89,5 +99,112 @@ export const accountRelations = relations(account, ({ one }) => ({
   user: one(user, {
     fields: [account.userId],
     references: [user.id],
+  }),
+}));
+
+// Asset Management Tables
+
+export const snapshotStatusEnum = pgEnum("snapshot_status", [
+  "completed",
+  "empty",
+]);
+
+export const category = pgTable(
+  "category",
+  {
+    id: text("id").primaryKey(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    name: text("name").notNull(),
+    isDefault: boolean("is_default").default(false).notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at")
+      .defaultNow()
+      .$onUpdate(() => new Date())
+      .notNull(),
+  },
+  (table) => [
+    index("category_userId_idx").on(table.userId),
+    index("category_userId_name_idx").on(table.userId, table.name),
+  ]
+);
+
+export const monthlySnapshot = pgTable(
+  "monthly_snapshot",
+  {
+    id: text("id").primaryKey(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    yearMonth: text("year_month").notNull(), // 'YYYY-MM' format
+    totalAmount: bigint("total_amount", { mode: "number" }).default(0).notNull(),
+    memo: text("memo"),
+    status: snapshotStatusEnum("status").default("empty").notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at")
+      .defaultNow()
+      .$onUpdate(() => new Date())
+      .notNull(),
+  },
+  (table) => [
+    index("monthlySnapshot_userId_idx").on(table.userId),
+    index("monthlySnapshot_userId_yearMonth_idx").on(table.userId, table.yearMonth),
+  ]
+);
+
+export const asset = pgTable(
+  "asset",
+  {
+    id: text("id").primaryKey(),
+    snapshotId: text("snapshot_id")
+      .notNull()
+      .references(() => monthlySnapshot.id, { onDelete: "cascade" }),
+    categoryId: text("category_id")
+      .notNull()
+      .references(() => category.id, { onDelete: "cascade" }),
+    amount: bigint("amount", { mode: "number" }).notNull(),
+    memo: text("memo"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at")
+      .defaultNow()
+      .$onUpdate(() => new Date())
+      .notNull(),
+  },
+  (table) => [
+    index("asset_snapshotId_idx").on(table.snapshotId),
+    index("asset_categoryId_idx").on(table.categoryId),
+  ]
+);
+
+// Asset Relations
+
+export const categoryRelations = relations(category, ({ one, many }) => ({
+  user: one(user, {
+    fields: [category.userId],
+    references: [user.id],
+  }),
+  assets: many(asset),
+}));
+
+export const monthlySnapshotRelations = relations(
+  monthlySnapshot,
+  ({ one, many }) => ({
+    user: one(user, {
+      fields: [monthlySnapshot.userId],
+      references: [user.id],
+    }),
+    assets: many(asset),
+  })
+);
+
+export const assetRelations = relations(asset, ({ one }) => ({
+  snapshot: one(monthlySnapshot, {
+    fields: [asset.snapshotId],
+    references: [monthlySnapshot.id],
+  }),
+  category: one(category, {
+    fields: [asset.categoryId],
+    references: [category.id],
   }),
 }));
