@@ -27,12 +27,6 @@ export const authMiddleware = (): MiddlewareHandler => {
       }
     }
 
-    // TODO possible to inspect ctx.req.url and not do this on every request
-    // Or skip starting the promise here and just invoke from server components and functions
-    await auth.api.getSession({
-      headers: c.req.raw.headers,
-    });
-
     await next();
 
     const contextData = unstable_getContextData();

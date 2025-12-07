@@ -2,15 +2,19 @@
 
 import { authClient } from "@/shared/auth/authClient";
 import { Button } from "@/shared/ui/button";
+import { toast } from "sonner";
 
 export function GoogleLoginButton() {
   const handleGoogleLogin = async () => {
-    // window.location.href = "/api/auth/signin/google";
-    const { data } = await authClient.signIn.social({
+    const { error } = await authClient.signIn.social({
       provider: "google",
     });
 
-    console.log(data);
+    if (error) {
+      toast.error("로그인에 실패했습니다.");
+
+      return;
+    }
   };
 
   return (

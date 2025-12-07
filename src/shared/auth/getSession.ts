@@ -7,3 +7,8 @@ export const getSession = async () => {
   });
   return session;
 };
+
+export const getIsLogginIn = async () => {
+  const session = await getSession();
+  return session !== null;
+};

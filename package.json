@@ -25,6 +25,7 @@
     "react": "19.2.0",
     "react-dom": "19.2.0",
     "react-server-dom-webpack": "19.2.0",
+    "sonner": "^2.0.7",
     "tailwind-merge": "^3.4.0",
     "tailwindcss-animate": "^1.0.7",
     "vite": "^7.2.6",
