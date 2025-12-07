@@ -10,9 +10,6 @@ reviews:
   auto_review:
     enabled: true
     drafts: false
-    instructions: |
-      모든 리뷰는 반드시 한국어로 작성해주세요.
-      Please write all reviews in Korean language.
   path_instructions:
     - path: "**/*.{ts,tsx}"
       instructions: |
