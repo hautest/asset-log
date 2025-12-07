@@ -1,38 +1,49 @@
-import '../styles.css';
+import "../styles.css";
 
-import type { ReactNode } from 'react';
-import { Footer } from '../components/footer';
-import { Header } from '../components/header';
+import type { ReactNode } from "react";
+import { unstable_getContext } from "waku/server";
+import { unstable_redirect } from "waku/router/server";
+
+import { Toaster } from "../shared/ui/sonner";
+import { getSession, getIsLogginIn } from "../shared/auth/getSession";
+
+// 인증 없이 접근 가능한 경로
+const PUBLIC_PATHS = ["/", "/login"];
+
+const isPublicPath = (pathname: string) => {
+  return PUBLIC_PATHS.some(
+    (path) => pathname === path || pathname.startsWith(`${path}/`)
+  );
+};
 
 type RootLayoutProps = { children: ReactNode };
 
 export default async function RootLayout({ children }: RootLayoutProps) {
   const data = await getData();
+  const context = unstable_getContext();
+  const currentPath = new URL(context.req.url).pathname;
+
+  const isLoggedIn = await getIsLogginIn();
+
+  // 인증되지 않은 사용자가 보호된 경로 접근 시 홈으로 리다이렉트
+  if (!isLoggedIn && !isPublicPath(currentPath)) {
+    unstable_redirect("/");
+  }
 
   return (
-    <div className="font-['Nunito']">
+    <div className="font-sans antialiased">
       <meta name="description" content={data.description} />
       <link rel="icon" type="image/png" href={data.icon} />
-      <link rel="preconnect" href="https://fonts.googleapis.com" />
-      <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
-      <link
-        rel="stylesheet"
-        href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,400;0,700;1,400;1,700&display=swap"
-        precedence="font"
-      />
-      <Header />
-      <main className="m-6 flex items-center *:min-h-64 *:min-w-64 lg:m-0 lg:min-h-svh lg:justify-center">
-        {children}
-      </main>
-      <Footer />
+      {children}
+      <Toaster />
     </div>
   );
 }
 
 const getData = async () => {
   const data = {
-    description: 'An internet website!',
-    icon: '/images/favicon.png',
+    description: "An internet website!",
+    icon: "/images/favicon.png",
   };
 
   return data;
@@ -40,6 +51,6 @@ const getData = async () => {
 
 export const getConfig = async () => {
   return {
-    render: 'static',
+    render: "dynamic",
   } as const;
 };
