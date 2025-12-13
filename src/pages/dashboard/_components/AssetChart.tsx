@@ -7,6 +7,14 @@ import {
 } from "@/shared/ui/chart";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid } from "recharts";
 
+interface ChartClickData {
+  activePayload?: Array<{
+    payload?: {
+      yearMonth?: string;
+    };
+  }>;
+}
+
 interface Category {
   id: string;
   name: string;
@@ -36,22 +44,22 @@ export function AssetChart({ data, categoryList }: AssetChartProps) {
     };
   });
 
-  const chartConfig = categoryList.reduce(
-    (acc, cat) => {
-      acc[cat.id] = { label: cat.name, color: cat.color };
-      return acc;
-    },
-    {} as Record<string, { label: string; color: string }>
-  );
+  const chartConfig = categoryList.reduce((acc, cat) => {
+    acc[cat.id] = { label: cat.name, color: cat.color };
+    return acc;
+  }, {} as Record<string, { label: string; color: string }>);
 
   return (
     <ChartContainer config={chartConfig} className="h-[400px] w-full">
       <BarChart
         data={chartData}
         onClick={(data) => {
-          if (data && data.activePayload) {
-            const yearMonth = data.activePayload[0].payload.yearMonth;
-            window.location.href = `/assets/${yearMonth}`;
+          const chartData = data as ChartClickData;
+          if (chartData?.activePayload?.[0]) {
+            const yearMonth = chartData.activePayload[0].payload?.yearMonth;
+            if (yearMonth) {
+              window.location.href = `/assets/${yearMonth}`;
+            }
           }
         }}
       >
