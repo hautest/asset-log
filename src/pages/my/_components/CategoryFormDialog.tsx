@@ -106,11 +106,11 @@ export function CategoryFormDialog({
 
   const handleRandomColor = () => {
     const randomColor = generateRandomColor();
-    setValue("color", randomColor);
+    setValue("color", randomColor, { shouldValidate: true, shouldDirty: true });
   };
 
   const handleColorPickerChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setValue("color", e.target.value);
+    setValue("color", e.target.value, { shouldValidate: true, shouldDirty: true });
   };
 
   const isPresetColor = PRESET_COLORS.includes(
@@ -142,13 +142,17 @@ export function CategoryFormDialog({
                 <button
                   key={color}
                   type="button"
+                  aria-label={`색상 선택: ${color}`}
+                  aria-pressed={selectedColor === color}
                   className={`h-8 w-8 rounded-full border-2 transition-transform hover:scale-110 ${
                     selectedColor === color
                       ? "border-slate-900 ring-2 ring-slate-900 ring-offset-2"
                       : "border-transparent"
                   }`}
                   style={{ backgroundColor: color }}
-                  onClick={() => setValue("color", color)}
+                  onClick={() =>
+                    setValue("color", color, { shouldValidate: true, shouldDirty: true })
+                  }
                 />
               ))}
               <div className="relative">
@@ -184,6 +188,7 @@ export function CategoryFormDialog({
                 onClick={handleRandomColor}
                 className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-dashed border-slate-300 transition-transform hover:scale-110 hover:border-slate-400"
                 title="랜덤 색상"
+                aria-label="랜덤 색상 생성"
               >
                 <Shuffle className="h-4 w-4 text-slate-400" />
               </button>
