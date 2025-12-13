@@ -1,6 +1,6 @@
 import { contextStorage } from "hono/context-storage";
 import { fsRouter } from "waku";
-import adapter from "waku/adapters/cloudflare";
+import adapter from "waku/adapters/default";
 import { authMiddleware } from "./middleware/auth";
 
 export default adapter(
