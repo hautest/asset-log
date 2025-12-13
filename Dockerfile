@@ -39,7 +39,6 @@ ENV BETTER_AUTH_SECRET=$BETTER_AUTH_SECRET
 ENV BETTER_AUTH_URL=$BETTER_AUTH_URL
 ENV GOOGLE_CLIENT_ID=$GOOGLE_CLIENT_ID
 ENV GOOGLE_CLIENT_SECRET=$GOOGLE_CLIENT_SECRET
-ENV PORT=3000
 
 RUN corepack enable && corepack prepare pnpm@latest --activate
 
@@ -49,4 +48,4 @@ COPY --from=builder /app/dist ./dist
 
 EXPOSE 3000
 
-CMD ["pnpm", "start"]
+CMD ["pnpm", "start", "--", "--port", "3000"]
