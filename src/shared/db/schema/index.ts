@@ -8,6 +8,7 @@ import {
   uniqueIndex,
   pgEnum,
   bigint,
+  integer,
 } from "drizzle-orm/pg-core";
 
 export const user = pgTable("user", {
@@ -111,7 +112,9 @@ export const category = pgTable(
       .notNull()
       .references(() => user.id, { onDelete: "cascade" }),
     name: text("name").notNull(),
+    color: text("color").notNull(),
     isDefault: boolean("is_default").default(false).notNull(),
+    sortOrder: integer("sort_order").default(0).notNull(),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at")
       .defaultNow()
@@ -121,6 +124,7 @@ export const category = pgTable(
   (table) => [
     index("category_userId_idx").on(table.userId),
     index("category_userId_name_idx").on(table.userId, table.name),
+    index("category_userId_sortOrder_idx").on(table.userId, table.sortOrder),
   ]
 );
 

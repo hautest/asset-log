@@ -8,6 +8,7 @@ export function GoogleLoginButton() {
   const handleGoogleLogin = async () => {
     const { error } = await authClient.signIn.social({
       provider: "google",
+      callbackURL: "/dashboard",
     });
 
     if (error) {
