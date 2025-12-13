@@ -4,4 +4,4 @@ Disallow: /RSC/
 Disallow: /api/
 Disallow: /dashboard/
 
-Sitemap: https://assetlog.kr/sitemap.xml
+Sitemap: https://asset-log.org/sitemap.xml
