@@ -1,11 +1,21 @@
 "use client";
 
+import { useRouter } from "waku";
 import {
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
 } from "@/shared/ui/chart";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid } from "recharts";
+
+function getActiveIndex(data: unknown): number | null {
+  if (typeof data !== "object" || data === null || !("activeIndex" in data)) {
+    return null;
+  }
+
+  const index = Number(data.activeIndex);
+  return Number.isNaN(index) ? null : index;
+}
 
 interface Category {
   id: string;
@@ -25,6 +35,8 @@ interface AssetChartProps {
 }
 
 export function AssetChart({ data, categoryList }: AssetChartProps) {
+  const router = useRouter();
+
   const chartData = data.map((snapshot) => {
     const [, month] = snapshot.yearMonth.split("-");
     return {
@@ -36,22 +48,22 @@ export function AssetChart({ data, categoryList }: AssetChartProps) {
     };
   });
 
-  const chartConfig = categoryList.reduce(
-    (acc, cat) => {
-      acc[cat.id] = { label: cat.name, color: cat.color };
-      return acc;
-    },
-    {} as Record<string, { label: string; color: string }>
-  );
+  const chartConfig = categoryList.reduce((acc, cat) => {
+    acc[cat.id] = { label: cat.name, color: cat.color };
+    return acc;
+  }, {} as Record<string, { label: string; color: string }>);
 
   return (
     <ChartContainer config={chartConfig} className="h-[400px] w-full">
       <BarChart
         data={chartData}
-        onClick={(data) => {
-          if (data && data.activePayload) {
-            const yearMonth = data.activePayload[0].payload.yearMonth;
-            window.location.href = `/assets/${yearMonth}`;
+        onClick={(clickData) => {
+          const activeIndex = getActiveIndex(clickData);
+          if (activeIndex !== null) {
+            const item = chartData[activeIndex];
+            if (item) {
+              router.push(`/assets/${item.yearMonth}`);
+            }
           }
         }}
       >
