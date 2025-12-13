@@ -1,9 +1,9 @@
 "use server";
 
 import { db } from "@/shared/db/db";
-import { monthlySnapshot, asset } from "@/shared/db/schema";
+import { monthlySnapshot, asset, category } from "@/shared/db/schema";
 import { getSession } from "@/shared/auth/getSession";
-import { eq, and } from "drizzle-orm";
+import { eq, and, inArray } from "drizzle-orm";
 import { nanoid } from "nanoid";
 
 interface AssetInput {
@@ -28,58 +28,66 @@ export async function saveAssets(input: SaveAssetsInput) {
   const { yearMonth, assets: assetInputs, memo } = input;
 
   const totalAmount = assetInputs.reduce((sum, a) => sum + a.amount, 0);
+  const snapshotId = nanoid();
 
-  const existingSnapshot = await db
-    .select()
-    .from(monthlySnapshot)
-    .where(
-      and(
-        eq(monthlySnapshot.userId, userId),
-        eq(monthlySnapshot.yearMonth, yearMonth)
-      )
-    )
-    .limit(1);
+  const result = await db.transaction(async (tx) => {
+    if (assetInputs.length > 0) {
+      const categoryIds = [...new Set(assetInputs.map((a) => a.categoryId))];
+      const ownedCategories = await tx
+        .select({ id: category.id })
+        .from(category)
+        .where(
+          and(eq(category.userId, userId), inArray(category.id, categoryIds))
+        );
 
-  const snapshotId =
-    existingSnapshot.length > 0 && existingSnapshot[0]
-      ? existingSnapshot[0].id
-      : nanoid();
+      const ownedCategoryIds = new Set(ownedCategories.map((c) => c.id));
+      const invalidCategoryIds = categoryIds.filter(
+        (id) => !ownedCategoryIds.has(id)
+      );
 
-  await db.transaction(async (tx) => {
-    if (existingSnapshot.length === 0 || !existingSnapshot[0]) {
-      await tx.insert(monthlySnapshot).values({
+      if (invalidCategoryIds.length > 0) {
+        throw new Error("Invalid category: unauthorized access");
+      }
+    }
+
+    const upsertResult = await tx
+      .insert(monthlySnapshot)
+      .values({
         id: snapshotId,
         userId,
         yearMonth,
         totalAmount,
         memo: memo ?? null,
         status: assetInputs.length > 0 ? "completed" : "empty",
-      });
-    } else {
-      await tx
-        .update(monthlySnapshot)
-        .set({
+      })
+      .onConflictDoUpdate({
+        target: [monthlySnapshot.userId, monthlySnapshot.yearMonth],
+        set: {
           totalAmount,
           memo: memo ?? null,
           status: assetInputs.length > 0 ? "completed" : "empty",
-        })
-        .where(eq(monthlySnapshot.id, snapshotId));
+        },
+      })
+      .returning({ id: monthlySnapshot.id });
 
-      await tx.delete(asset).where(eq(asset.snapshotId, snapshotId));
-    }
+    const actualSnapshotId = upsertResult[0]?.id ?? snapshotId;
+
+    await tx.delete(asset).where(eq(asset.snapshotId, actualSnapshotId));
 
     if (assetInputs.length > 0) {
       await tx.insert(asset).values(
         assetInputs.map((a) => ({
           id: nanoid(),
-          snapshotId,
+          snapshotId: actualSnapshotId,
           categoryId: a.categoryId,
           amount: a.amount,
           memo: a.memo ?? null,
         }))
       );
     }
+
+    return actualSnapshotId;
   });
 
-  return { success: true, snapshotId };
+  return { success: true, snapshotId: result };
 }

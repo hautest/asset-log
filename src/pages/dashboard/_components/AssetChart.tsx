@@ -17,6 +17,22 @@ function getActiveIndex(data: unknown): number | null {
   return Number.isNaN(index) ? null : index;
 }
 
+function getYAxisConfig(maxValue: number) {
+  if (maxValue >= 100000000) {
+    return { divisor: 100000000, suffix: "억" };
+  }
+  if (maxValue >= 10000000) {
+    return { divisor: 10000000, suffix: "천만" };
+  }
+  if (maxValue >= 1000000) {
+    return { divisor: 1000000, suffix: "백만" };
+  }
+  if (maxValue >= 10000) {
+    return { divisor: 10000, suffix: "만" };
+  }
+  return { divisor: 1, suffix: "원" };
+}
+
 interface Category {
   id: string;
   name: string;
@@ -48,6 +64,9 @@ export function AssetChart({ data, categoryList }: AssetChartProps) {
     };
   });
 
+  const maxValue = Math.max(...data.map((d) => d.totalAmount), 0);
+  const yAxisConfig = getYAxisConfig(maxValue);
+
   const chartConfig = categoryList.reduce((acc, cat) => {
     acc[cat.id] = { label: cat.name, color: cat.color };
     return acc;
@@ -78,7 +97,10 @@ export function AssetChart({ data, categoryList }: AssetChartProps) {
           tickLine={false}
           axisLine={false}
           tickMargin={8}
-          tickFormatter={(value) => `${(value / 10000000).toFixed(0)}천만`}
+          tickFormatter={(value) => {
+            const formatted = value / yAxisConfig.divisor;
+            return `${formatted % 1 === 0 ? formatted.toFixed(0) : formatted.toFixed(1)}${yAxisConfig.suffix}`;
+          }}
         />
         <ChartTooltip
           content={<ChartTooltipContent />}

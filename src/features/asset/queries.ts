@@ -1,8 +1,15 @@
 import { db } from "@/shared/db/db";
 import { monthlySnapshot, asset, category } from "@/shared/db/schema";
-import { eq, and, asc } from "drizzle-orm";
+import { eq, and, asc, inArray, like } from "drizzle-orm";
+import { getSession } from "@/shared/auth/getSession";
 
-export async function getSnapshotByYearMonth(userId: string, yearMonth: string) {
+export async function getSnapshotByYearMonth(yearMonth: string) {
+  const session = await getSession();
+  if (!session) {
+    throw new Error("Unauthorized");
+  }
+  const userId = session.user.id;
+
   const snapshot = await db
     .select()
     .from(monthlySnapshot)
@@ -31,7 +38,10 @@ export async function getSnapshotByYearMonth(userId: string, yearMonth: string) 
       memo: asset.memo,
     })
     .from(asset)
-    .innerJoin(category, eq(asset.categoryId, category.id))
+    .innerJoin(
+      category,
+      and(eq(asset.categoryId, category.id), eq(category.userId, userId))
+    )
     .where(eq(asset.snapshotId, snapshotData.id))
     .orderBy(asc(category.sortOrder));
 
@@ -41,16 +51,90 @@ export async function getSnapshotByYearMonth(userId: string, yearMonth: string) 
   };
 }
 
-export async function getYearSnapshots(userId: string, year: number) {
-  const snapshots = await db
+export async function getYearSnapshots(year: number) {
+  const session = await getSession();
+  if (!session) {
+    throw new Error("Unauthorized");
+  }
+
+  return db
     .select()
     .from(monthlySnapshot)
     .where(
       and(
-        eq(monthlySnapshot.userId, userId),
-        // yearMonth format is 'YYYY-MM'
+        eq(monthlySnapshot.userId, session.user.id),
+        like(monthlySnapshot.yearMonth, `${year}-%`)
       )
     );
+}
 
-  return snapshots.filter((s) => s.yearMonth.startsWith(`${year}-`));
+interface MonthData {
+  yearMonth: string;
+  totalAmount: number;
+  status: "completed" | "empty";
+  categories: Record<string, number>;
+}
+
+export async function getYearSnapshotsWithAssets(
+  year: number
+): Promise<MonthData[]> {
+  const session = await getSession();
+  if (!session) {
+    throw new Error("Unauthorized");
+  }
+  const userId = session.user.id;
+
+  const snapshots = await db
+    .select()
+    .from(monthlySnapshot)
+    .where(eq(monthlySnapshot.userId, userId));
+
+  const yearSnapshots = snapshots.filter((s) =>
+    s.yearMonth.startsWith(`${year}-`)
+  );
+
+  const snapshotIds = yearSnapshots.map((s) => s.id);
+
+  let assets: { snapshotId: string; categoryId: string; amount: number }[] = [];
+  if (snapshotIds.length > 0) {
+    assets = await db
+      .select({
+        snapshotId: asset.snapshotId,
+        categoryId: asset.categoryId,
+        amount: asset.amount,
+      })
+      .from(asset)
+      .where(inArray(asset.snapshotId, snapshotIds));
+  }
+
+  const snapshotMap = new Map(yearSnapshots.map((s) => [s.yearMonth, s]));
+
+  const assetsBySnapshot = new Map<string, Record<string, number>>();
+  for (const a of assets) {
+    const existing = assetsBySnapshot.get(a.snapshotId) || {};
+    existing[a.categoryId] = a.amount;
+    assetsBySnapshot.set(a.snapshotId, existing);
+  }
+
+  return Array.from({ length: 12 }, (_, i) => {
+    const month = String(i + 1).padStart(2, "0");
+    const yearMonth = `${year}-${month}`;
+    const snapshot = snapshotMap.get(yearMonth);
+
+    if (snapshot) {
+      return {
+        yearMonth,
+        totalAmount: snapshot.totalAmount,
+        status: snapshot.status,
+        categories: assetsBySnapshot.get(snapshot.id) || {},
+      };
+    }
+
+    return {
+      yearMonth,
+      totalAmount: 0,
+      status: "empty" as const,
+      categories: {},
+    };
+  });
 }
