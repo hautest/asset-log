@@ -18,13 +18,21 @@ export async function updateCategory(input: UpdateCategoryInput) {
     throw new Error("Unauthorized");
   }
 
+  if (input.name !== undefined && input.name.trim() === "") {
+    throw new Error("카테고리 이름은 비어있을 수 없습니다");
+  }
+
+  if (input.color !== undefined && input.color.trim() === "") {
+    throw new Error("카테고리 색상은 비어있을 수 없습니다");
+  }
+
   const userId = session.user.id;
 
   const [updated] = await db
     .update(category)
     .set({
-      ...(input.name && { name: input.name }),
-      ...(input.color && { color: input.color }),
+      ...(input.name !== undefined && { name: input.name }),
+      ...(input.color !== undefined && { color: input.color }),
     })
     .where(and(eq(category.id, input.id), eq(category.userId, userId)))
     .returning();
