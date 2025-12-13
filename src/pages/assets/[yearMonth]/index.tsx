@@ -1,6 +1,6 @@
 import { getSession } from "@/shared/auth/getSession";
 import { redirect } from "@/shared/router/router";
-import { getCategoriesByUserId } from "@/features/category/queries";
+import { getCategories } from "@/features/category/queries";
 import { getSnapshotByYearMonth } from "@/features/asset/queries";
 import { Link } from "waku";
 import { AppHeader } from "@/shared/components/AppHeader";
@@ -8,6 +8,12 @@ import { AssetEditor } from "./_components/AssetEditor";
 
 interface AssetDetailPageProps {
   yearMonth: string;
+}
+
+const YEAR_MONTH_REGEX = /^\d{4}-(0[1-9]|1[0-2])$/;
+
+function isValidYearMonth(yearMonth: string): boolean {
+  return YEAR_MONTH_REGEX.test(yearMonth);
 }
 
 function formatYearMonth(yearMonth: string): string {
@@ -24,9 +30,13 @@ export default async function AssetDetailPage({
     return redirect("/login");
   }
 
+  if (!isValidYearMonth(yearMonth)) {
+    return redirect("/dashboard");
+  }
+
   const [categories, snapshot] = await Promise.all([
-    getCategoriesByUserId(session.user.id),
-    getSnapshotByYearMonth(session.user.id, yearMonth),
+    getCategories(),
+    getSnapshotByYearMonth(yearMonth),
   ]);
 
   const existingAssets = snapshot?.assets ?? [];

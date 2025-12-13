@@ -1,3 +1,4 @@
+import { Link } from "waku";
 import { Card, CardContent, CardHeader, CardTitle } from "@/shared/ui/card";
 import { Button } from "@/shared/ui/button";
 import { Plus } from "lucide-react";
@@ -29,6 +30,9 @@ export function ChartSection({
   data,
   categoryList,
 }: ChartSectionProps) {
+  const now = new Date();
+  const currentYearMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+
   return (
     <Card>
       <CardHeader className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -46,10 +50,12 @@ export function ChartSection({
         <AssetChart data={data} categoryList={categoryList} />
 
         <div className="flex justify-center pt-6">
-          <Button size="lg" className="gap-2">
-            <Plus className="h-5 w-5" />
-            이번 달 자산 입력하기
-          </Button>
+          <Link to={`/assets/${currentYearMonth}`}>
+            <Button size="lg" className="gap-2">
+              <Plus className="h-5 w-5" />
+              이번 달 자산 입력하기
+            </Button>
+          </Link>
         </div>
       </CardContent>
     </Card>

@@ -1,6 +1,6 @@
 import { getSession } from "@/shared/auth/getSession";
 import { redirect } from "@/shared/router/router";
-import { getCategoriesByUserId } from "@/features/category/queries";
+import { getCategories } from "@/features/category/queries";
 import { Link } from "waku";
 import { AppHeader } from "@/shared/components/AppHeader";
 import { LogoutButton } from "../dashboard/_components/LogoutButton";
@@ -14,7 +14,7 @@ export default async function MyPage() {
     return redirect("/login");
   }
 
-  const categories = await getCategoriesByUserId(session.user.id);
+  const categories = await getCategories();
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
