@@ -10,6 +10,12 @@ interface AssetDetailPageProps {
   yearMonth: string;
 }
 
+const YEAR_MONTH_REGEX = /^\d{4}-(0[1-9]|1[0-2])$/;
+
+function isValidYearMonth(yearMonth: string): boolean {
+  return YEAR_MONTH_REGEX.test(yearMonth);
+}
+
 function formatYearMonth(yearMonth: string): string {
   const [year, month] = yearMonth.split("-");
   return `${year}년 ${Number(month)}월`;
@@ -22,6 +28,10 @@ export default async function AssetDetailPage({
 
   if (!session) {
     return redirect("/login");
+  }
+
+  if (!isValidYearMonth(yearMonth)) {
+    return redirect("/dashboard");
   }
 
   const [categories, snapshot] = await Promise.all([
