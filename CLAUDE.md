@@ -213,22 +213,10 @@ useUserQuery.queryKey= queryKey
 
 ---
 
-## 📋 현재 진행 상황
-
-- [ ] 프로젝트 초기 세팅 (Waku + Tailwind + Shadcn)
-- [ ] DB 스키마 설계 (Drizzle)
-- [ ] 인증 구현 (Better Auth)
-- [ ] 자산 CRUD
-- [ ] 대시보드 UI
-- [ ] 월봉 차트 (TradingView Lightweight Charts)
-
----
-
 ## 📚 참고 문서
 
 - Waku: https://waku.gg/docs
 - Better Auth: https://www.better-auth.com/docs
 - Drizzle ORM: https://orm.drizzle.team/docs
-- TradingView Lightweight Charts: https://tradingview.github.io/lightweight-charts/docs
 - Shadcn/ui: https://ui.shadcn.com/docs
 - Tailwind CSS: https://tailwindcss.com/docs
