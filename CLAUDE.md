@@ -132,6 +132,18 @@ export function AssetForm({ onSubmit }: AssetFormProps) {
 }
 ```
 
+```tsx
+export async function Comp () {
+  const data = await getData()
+
+  return ...
+}
+
+Comp.Skeleton = ()=>{
+  return <Skeleton />
+}
+```
+
 ### 타입 규칙
 
 - `any` 사용 금지
@@ -186,6 +198,8 @@ const form = useForm<FormData>({
 ```
 
 ### 기본적인 데이터 fetching, mutation 방법
+
+서버 컴포넌트에서 데이터 fetching을 하는 것을 기본으로 수행한다.
 
 - queries, mutations 폴더에서 훅 생성
 - 파일 이름과 함수 이름 끝에 Query, SuspenseQuery, Mutation을 붙어야 함.
