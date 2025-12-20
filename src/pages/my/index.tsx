@@ -3,7 +3,7 @@ import { getSession } from "@/shared/auth/getSession";
 import { redirect } from "@/shared/router/router";
 import { Link } from "waku";
 import { AppHeader } from "@/shared/components/AppHeader";
-import { LogoutButton } from "../dashboard/_components/LogoutButton";
+import { LogoutButton } from "./_components/LogoutButton";
 import { UserInfoCard } from "./_components/UserInfoCard";
 import { CategoryManageCardSection } from "./_components/CategoryManageCardSection";
 
