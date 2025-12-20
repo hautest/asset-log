@@ -1,10 +1,11 @@
 "use client";
 
 import { Link, useRouter } from "waku";
-import { BarChart3, Calendar, Banknote } from "lucide-react";
+import { BarChart3, Calendar, Banknote, User, LogOut } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
+  SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
@@ -13,6 +14,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/shared/ui/sidebar";
+import { authClient } from "@/shared/auth/authClient";
 
 const MENU_ITEMS = [
   {
@@ -21,7 +23,7 @@ const MENU_ITEMS = [
     icon: Calendar,
   },
   {
-    title: "연봉 상승",
+    title: "연봉 추이",
     url: "/dashboard/salary" as const,
     icon: Banknote,
   },
@@ -29,16 +31,23 @@ const MENU_ITEMS = [
 
 export function AppSidebar() {
   const router = useRouter();
-  const currentPath = router.path;
+  const currentPath = router.path.split("?")[0];
+
+  const handleLogout = async () => {
+    await authClient.signOut();
+    router.replace("/");
+  };
 
   return (
-    <Sidebar collapsible="offcanvas">
+    <Sidebar collapsible="icon">
       <SidebarHeader className="border-b">
-        <Link to="/dashboard" className="flex items-center gap-2 px-2 py-1">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-600">
+        <Link to="/dashboard" className="flex items-center gap-2">
+          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-emerald-600">
             <BarChart3 className="h-4 w-4 text-white" />
           </div>
-          <span className="text-lg font-bold text-slate-900">자산로그</span>
+          <span className="whitespace-nowrap overflow-hidden text-lg font-bold text-slate-900 group-data-[collapsible=icon]:hidden">
+            자산로그
+          </span>
         </Link>
       </SidebarHeader>
       <SidebarContent>
@@ -63,6 +72,24 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
+      <SidebarFooter className="border-t">
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton asChild isActive={currentPath === "/my"}>
+              <Link to="/my">
+                <User />
+                <span>마이페이지</span>
+              </Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+          <SidebarMenuItem>
+            <SidebarMenuButton onClick={handleLogout}>
+              <LogOut />
+              <span>로그아웃</span>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarFooter>
     </Sidebar>
   );
 }

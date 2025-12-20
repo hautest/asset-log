@@ -31,7 +31,9 @@ export function ChartSection({
   categoryList,
 }: ChartSectionProps) {
   const now = new Date();
-  const currentYearMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+  const currentYearMonth = `${now.getFullYear()}-${String(
+    now.getMonth() + 1
+  ).padStart(2, "0")}`;
 
   return (
     <Card>
@@ -50,7 +52,7 @@ export function ChartSection({
         <AssetChart data={data} categoryList={categoryList} />
 
         <div className="flex justify-center pt-6">
-          <Link to={`/assets/${currentYearMonth}`}>
+          <Link to={`/dashboard/monthly/assets/${currentYearMonth}`}>
             <Button size="lg" className="gap-2">
               <Plus className="h-5 w-5" />
               이번 달 자산 입력하기

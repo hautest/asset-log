@@ -9,7 +9,7 @@ async function CategoryManageCardSection() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-lg">카테고리 관리</CardTitle>
+        <CardTitle className="text-lg">월별 자산 추이 카테고리 관리</CardTitle>
         <p className="text-sm text-slate-500">
           드래그하여 차트에 표시되는 순서를 변경하세요
         </p>

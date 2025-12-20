@@ -51,7 +51,7 @@ export function YearSelector({ selectedYear }: YearSelectorProps) {
     if (year < START_YEAR || year > endYear) return;
     setDisplayYear(year);
     setIsOpen(false);
-    router.push(`/dashboard?year=${year}`);
+    router.push(`/dashboard/monthly?year=${year}`);
   };
 
   const handlePrevYear = () => {
@@ -64,7 +64,7 @@ export function YearSelector({ selectedYear }: YearSelectorProps) {
     }
 
     if (!isOpen) {
-      router.push(`/dashboard?year=${newYear}`);
+      router.push(`/dashboard/monthly?year=${newYear}`);
     }
   };
 
@@ -78,7 +78,7 @@ export function YearSelector({ selectedYear }: YearSelectorProps) {
     }
 
     if (!isOpen) {
-      router.push(`/dashboard?year=${newYear}`);
+      router.push(`/dashboard/monthly?year=${newYear}`);
     }
   };
 
@@ -99,7 +99,7 @@ export function YearSelector({ selectedYear }: YearSelectorProps) {
   const handleOpenChange = (open: boolean) => {
     setIsOpen(open);
     if (!open && displayYear !== selectedYear) {
-      router.push(`/dashboard?year=${displayYear}`);
+      router.push(`/dashboard/monthly?year=${displayYear}`);
     }
   };
 

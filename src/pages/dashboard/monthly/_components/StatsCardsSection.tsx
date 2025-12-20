@@ -1,5 +1,5 @@
 import { getYearSnapshotsWithAssets } from "@/features/asset/queries";
-import { Card, CardContent, CardHeader, CardTitle } from "@/shared/ui/card";
+import { Card, CardContent, CardHeader } from "@/shared/ui/card";
 import { Skeleton } from "@/shared/ui/skeleton";
 import { StatsCards } from "./StatsCards";
 
@@ -23,7 +23,9 @@ const calculateGrowth = (snapshots: MonthData[]) => {
 
   if (!latest || !previous || previous.totalAmount === 0) return 0;
 
-  return ((latest.totalAmount - previous.totalAmount) / previous.totalAmount) * 100;
+  return (
+    ((latest.totalAmount - previous.totalAmount) / previous.totalAmount) * 100
+  );
 };
 
 const calculateYearOverYearGrowth = (
@@ -56,7 +58,10 @@ async function StatsCardsSection({ selectedYear }: StatsCardsSectionProps) {
 
   const latestSnapshot = yearData.filter((s) => s.status === "completed").pop();
   const growth = calculateGrowth(yearData);
-  const yearOverYearGrowth = calculateYearOverYearGrowth(yearData, previousYearData);
+  const yearOverYearGrowth = calculateYearOverYearGrowth(
+    yearData,
+    previousYearData
+  );
 
   return (
     <StatsCards
