@@ -1,10 +1,9 @@
+import { Suspense } from "react";
 import { getSession } from "@/shared/auth/getSession";
 import { redirect } from "@/shared/router/router";
-import { getCategories } from "@/features/category/queries";
-import { getSnapshotByYearMonth } from "@/features/asset/queries";
 import { Link } from "waku";
 import { AppHeader } from "@/shared/components/AppHeader";
-import { AssetEditor } from "./_components/AssetEditor";
+import { AssetEditorSection } from "./_components/AssetEditorSection";
 
 interface AssetDetailPageProps {
   yearMonth: string;
@@ -34,13 +33,6 @@ export default async function AssetDetailPage({
     return redirect("/dashboard");
   }
 
-  const [categories, snapshot] = await Promise.all([
-    getCategories(),
-    getSnapshotByYearMonth(yearMonth),
-  ]);
-
-  const existingAssets = snapshot?.assets ?? [];
-
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
       <AppHeader
@@ -59,12 +51,9 @@ export default async function AssetDetailPage({
           {formatYearMonth(yearMonth)} 자산 등록
         </h1>
 
-        <AssetEditor
-          yearMonth={yearMonth}
-          categories={categories}
-          existingAssets={existingAssets}
-          snapshotMemo={snapshot?.memo ?? null}
-        />
+        <Suspense fallback={<AssetEditorSection.Skeleton />}>
+          <AssetEditorSection yearMonth={yearMonth} />
+        </Suspense>
       </main>
     </div>
   );
