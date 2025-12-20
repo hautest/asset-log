@@ -1,8 +1,8 @@
 import { Suspense } from "react";
 import { getSession } from "@/shared/auth/getSession";
 import { redirect } from "@/shared/router/router";
-import { StatsCardsSection } from "../_components/StatsCardsSection";
-import { ChartSectionContainer } from "../_components/ChartSectionContainer";
+import { StatsCardsSection } from "./_components/StatsCardsSection";
+import { ChartSectionContainer } from "./_components/ChartSectionContainer";
 
 export default async function MonthlyPage({ query }: { query?: string }) {
   const session = await getSession();

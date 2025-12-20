@@ -30,7 +30,7 @@ const menuItems = [
     icon: Calendar,
   },
   {
-    title: "연봉 상승",
+    title: "연봉 추이",
     url: "/dashboard/salary" as const,
     icon: Banknote,
   },

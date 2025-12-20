@@ -9,6 +9,7 @@ import {
   pgEnum,
   bigint,
   integer,
+  uuid,
 } from "drizzle-orm/pg-core";
 
 export const user = pgTable("user", {
@@ -217,4 +218,36 @@ export const userRelations = relations(user, ({ many }) => ({
   accounts: many(account),
   categories: many(category),
   monthlySnapshots: many(monthlySnapshot),
+  salaries: many(salary),
+}));
+
+// Salary Table
+
+export const salary = pgTable(
+  "salary",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    year: integer("year").notNull(),
+    amount: bigint("amount", { mode: "number" }).notNull(),
+    memo: text("memo"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at")
+      .defaultNow()
+      .$onUpdate(() => new Date())
+      .notNull(),
+  },
+  (table) => [
+    index("salary_userId_idx").on(table.userId),
+    uniqueIndex("salary_userId_year_unique").on(table.userId, table.year),
+  ]
+);
+
+export const salaryRelations = relations(salary, ({ one }) => ({
+  user: one(user, {
+    fields: [salary.userId],
+    references: [user.id],
+  }),
 }));

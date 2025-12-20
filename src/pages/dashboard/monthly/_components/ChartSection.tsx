@@ -31,7 +31,9 @@ export function ChartSection({
   categoryList,
 }: ChartSectionProps) {
   const now = new Date();
-  const currentYearMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+  const currentYearMonth = `${now.getFullYear()}-${String(
+    now.getMonth() + 1
+  ).padStart(2, "0")}`;
 
   return (
     <Card>
