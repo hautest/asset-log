@@ -14,7 +14,7 @@ import {
   SidebarMenuItem,
 } from "@/shared/ui/sidebar";
 
-const menuItems = [
+const MENU_ITEMS = [
   {
     title: "월별 자산 추이",
     url: "/dashboard/monthly" as const,
@@ -46,7 +46,7 @@ export function AppSidebar() {
           <SidebarGroupLabel>대시보드</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {menuItems.map((item) => (
+              {MENU_ITEMS.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton
                     asChild
