@@ -132,6 +132,18 @@ export function AssetForm({ onSubmit }: AssetFormProps) {
 }
 ```
 
+```tsx
+export async function Comp () {
+  const data = await getData()
+
+  return ...
+}
+
+Comp.Skeleton = ()=>{
+  return <Skeleton />
+}
+```
+
 ### 타입 규칙
 
 - `any` 사용 금지
@@ -143,6 +155,14 @@ export function AssetForm({ onSubmit }: AssetFormProps) {
 - Tailwind CSS만 사용
 - 인라인 스타일 금지(단, 정적 분석이 불가능한 스타일은 인라인 스타일 허용)
 - 반응형으로 구성하며, 모바일 뷰도 대응해야한다.
+
+### 라우팅 규칙
+
+- 서비스 내부의 이동은 waku에서 제공하는 useRouter, Link를 사용하여 처리한다.
+
+### import 규칙
+
+- React. 을 사용하지 않고 해당 모듈을 직접 import한다.
 
 ---
 
@@ -187,6 +207,8 @@ const form = useForm<FormData>({
 
 ### 기본적인 데이터 fetching, mutation 방법
 
+서버 컴포넌트에서 데이터 fetching을 하는 것을 기본으로 수행한다.
+
 - queries, mutations 폴더에서 훅 생성
 - 파일 이름과 함수 이름 끝에 Query, SuspenseQuery, Mutation을 붙어야 함.
 
@@ -213,22 +235,10 @@ useUserQuery.queryKey= queryKey
 
 ---
 
-## 📋 현재 진행 상황
-
-- [ ] 프로젝트 초기 세팅 (Waku + Tailwind + Shadcn)
-- [ ] DB 스키마 설계 (Drizzle)
-- [ ] 인증 구현 (Better Auth)
-- [ ] 자산 CRUD
-- [ ] 대시보드 UI
-- [ ] 월봉 차트 (TradingView Lightweight Charts)
-
----
-
 ## 📚 참고 문서
 
 - Waku: https://waku.gg/docs
 - Better Auth: https://www.better-auth.com/docs
 - Drizzle ORM: https://orm.drizzle.team/docs
-- TradingView Lightweight Charts: https://tradingview.github.io/lightweight-charts/docs
 - Shadcn/ui: https://ui.shadcn.com/docs
 - Tailwind CSS: https://tailwindcss.com/docs
