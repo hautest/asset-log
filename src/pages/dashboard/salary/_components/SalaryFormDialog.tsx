@@ -9,16 +9,11 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/shared/ui/dialog";
-import { Input } from "@/shared/ui/input";
 import { Label } from "@/shared/ui/label";
 import { Button } from "@/shared/ui/button";
 import { Textarea } from "@/shared/ui/textarea";
+import { AmountInput } from "@/shared/ui/amount-input";
 import { useEffect, useRef } from "react";
-
-function formatAmount(value: number): string {
-  if (value === 0) return "";
-  return value.toLocaleString();
-}
 
 const salarySchema = z.object({
   year: z
@@ -105,16 +100,12 @@ export function SalaryFormDialog({
               name="amount"
               control={control}
               render={({ field }) => (
-                <Input
+                <AmountInput
                   id="amount"
-                  type="text"
-                  inputMode="numeric"
                   placeholder="예: 50,000,000"
-                  value={formatAmount(field.value)}
-                  onChange={(e) => {
-                    const numericValue = e.target.value.replace(/[^0-9]/g, "");
-                    field.onChange(numericValue ? Number(numericValue) : 0);
-                  }}
+                  value={field.value}
+                  onChange={field.onChange}
+                  className="text-left"
                 />
               )}
             />

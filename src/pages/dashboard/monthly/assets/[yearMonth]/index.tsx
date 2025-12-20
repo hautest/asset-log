@@ -35,17 +35,6 @@ export default async function AssetDetailPage({
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
-      <AppHeader
-        rightNode={
-          <Link
-            to="/dashboard"
-            className="text-sm font-medium text-slate-600 hover:text-slate-900"
-          >
-            대시보드
-          </Link>
-        }
-      />
-
       <main className="mx-auto max-w-4xl px-4 py-8">
         <h1 className="mb-8 text-2xl font-bold text-slate-900">
           {formatYearMonth(yearMonth)} 자산 등록

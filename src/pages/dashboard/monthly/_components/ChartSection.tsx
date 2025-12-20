@@ -52,7 +52,7 @@ export function ChartSection({
         <AssetChart data={data} categoryList={categoryList} />
 
         <div className="flex justify-center pt-6">
-          <Link to={`/assets/${currentYearMonth}`}>
+          <Link to={`/dashboard/monthly/assets/${currentYearMonth}`}>
             <Button size="lg" className="gap-2">
               <Plus className="h-5 w-5" />
               이번 달 자산 입력하기

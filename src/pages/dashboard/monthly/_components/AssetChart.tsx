@@ -81,7 +81,7 @@ export function AssetChart({ data, categoryList }: AssetChartProps) {
           if (activeIndex !== null) {
             const item = chartData[activeIndex];
             if (item) {
-              router.push(`/assets/${item.yearMonth}`);
+              router.push(`/dashboard/monthly/assets/${item.yearMonth}`);
             }
           }
         }}

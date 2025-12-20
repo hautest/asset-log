@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter, Link } from "waku";
 import { Button } from "@/shared/ui/button";
 import { Input } from "@/shared/ui/input";
+import { AmountInput } from "@/shared/ui/amount-input";
 import { Card, CardContent, CardFooter, CardHeader } from "@/shared/ui/card";
 import {
   Table,
@@ -45,17 +46,8 @@ interface AssetRow {
   categoryId: string;
   categoryName: string;
   categoryColor: string;
-  amount: string;
+  amount: number;
   memo: string;
-}
-
-function parseAmount(value: string): number {
-  return Number(value.replace(/,/g, "")) || 0;
-}
-
-function formatAmount(value: number): string {
-  if (value === 0) return "";
-  return value.toLocaleString();
 }
 
 export function AssetEditor({
@@ -73,7 +65,7 @@ export function AssetEditor({
       categoryId: cat.id,
       categoryName: cat.name,
       categoryColor: cat.color,
-      amount: existing ? formatAmount(existing.amount) : "",
+      amount: existing?.amount ?? 0,
       memo: existing?.memo ?? "",
     };
   });
@@ -81,18 +73,12 @@ export function AssetEditor({
   const [rows, setRows] = useState<AssetRow[]>(initialRows);
   const [memo, setMemo] = useState(snapshotMemo ?? "");
 
-  const totalAmount = rows.reduce(
-    (sum, row) => sum + parseAmount(row.amount),
-    0
-  );
+  const totalAmount = rows.reduce((sum, row) => sum + row.amount, 0);
 
-  const handleAmountChange = (categoryId: string, value: string) => {
-    const numericValue = value.replace(/[^0-9]/g, "");
-    const formatted = numericValue ? Number(numericValue).toLocaleString() : "";
-
+  const handleAmountChange = (categoryId: string, value: number) => {
     setRows((prev) =>
       prev.map((row) =>
-        row.categoryId === categoryId ? { ...row, amount: formatted } : row
+        row.categoryId === categoryId ? { ...row, amount: value } : row
       )
     );
   };
@@ -108,7 +94,7 @@ export function AssetEditor({
   const handleClearRow = (categoryId: string) => {
     setRows((prev) =>
       prev.map((row) =>
-        row.categoryId === categoryId ? { ...row, amount: "", memo: "" } : row
+        row.categoryId === categoryId ? { ...row, amount: 0, memo: "" } : row
       )
     );
   };
@@ -118,10 +104,10 @@ export function AssetEditor({
 
     try {
       const assetsToSave = rows
-        .filter((row) => parseAmount(row.amount) > 0)
+        .filter((row) => row.amount > 0)
         .map((row) => ({
           categoryId: row.categoryId,
-          amount: parseAmount(row.amount),
+          amount: row.amount,
           memo: row.memo || undefined,
         }));
 
@@ -182,15 +168,13 @@ export function AssetEditor({
                   </div>
                 </TableCell>
                 <TableCell>
-                  <Input
-                    type="text"
-                    inputMode="numeric"
+                  <AmountInput
                     placeholder="0"
                     value={row.amount}
-                    onChange={(e) =>
-                      handleAmountChange(row.categoryId, e.target.value)
+                    onChange={(value) =>
+                      handleAmountChange(row.categoryId, value)
                     }
-                    className="w-40 text-right"
+                    className="w-40"
                   />
                 </TableCell>
                 <TableCell>
@@ -210,7 +194,7 @@ export function AssetEditor({
                     variant="ghost"
                     size="icon"
                     onClick={() => handleClearRow(row.categoryId)}
-                    disabled={!row.amount && !row.memo}
+                    disabled={row.amount === 0 && !row.memo}
                     className="text-muted-foreground hover:text-destructive"
                   >
                     <Trash2 className="h-4 w-4" />
