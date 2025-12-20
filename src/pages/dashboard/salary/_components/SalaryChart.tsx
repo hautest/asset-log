@@ -50,7 +50,7 @@ function formatYAxisValue(value: number): string {
   if (value >= 10000) {
     const formatted = value / 10000;
     return `${
-      formatted % 1 === 0 ? formatted.toFixed(0) : formatted.toFixed(0)
+      formatted % 1 === 0 ? formatted.toFixed(0) : formatted.toFixed(1)
     }만원`;
   }
   return `${value}원`;

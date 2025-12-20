@@ -1,18 +1,61 @@
+"use client";
+
+import { useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/shared/ui/card";
 import { Banknote, TrendingUp } from "lucide-react";
 import { formatCurrency } from "@/shared/utils/formatCurrency";
+import type { SalaryData } from "@/features/salary/queries";
 
 interface SalaryStatsCardsProps {
-  currentSalary: number | null;
-  currentYear: number | null;
-  growthRate: number | null;
+  salaries: SalaryData[];
+  latestSalary: {
+    amount: number;
+    year: number;
+    growthRate: number | null;
+  } | null;
 }
 
 export function SalaryStatsCards({
-  currentSalary,
-  currentYear,
-  growthRate,
+  salaries,
+  latestSalary,
 }: SalaryStatsCardsProps) {
+  const { currentSalary, currentYear, growthRate } = useMemo(() => {
+    const allSalaries = [...salaries];
+    if (latestSalary && !allSalaries.some((s) => s.year === latestSalary.year)) {
+      allSalaries.push({
+        id: "",
+        year: latestSalary.year,
+        amount: latestSalary.amount,
+        memo: null,
+        growthRate: latestSalary.growthRate,
+      });
+    }
+    const sorted = allSalaries
+      .filter((s) => s.amount > 0)
+      .sort((a, b) => b.year - a.year);
+    const latest = sorted[0];
+    if (!latest) {
+      return { currentSalary: null, currentYear: null, growthRate: null };
+    }
+
+    // 최신 연봉의 growthRate가 null이고, latestSalary에 같은 년도의 growthRate가 있으면 사용
+    let finalGrowthRate = latest.growthRate;
+    if (
+      finalGrowthRate === null &&
+      latestSalary &&
+      latestSalary.year === latest.year &&
+      latestSalary.growthRate !== null
+    ) {
+      finalGrowthRate = latestSalary.growthRate;
+    }
+
+    return {
+      currentSalary: latest.amount,
+      currentYear: latest.year,
+      growthRate: finalGrowthRate,
+    };
+  }, [salaries, latestSalary]);
+
   return (
     <div className="mb-8 grid gap-6 md:grid-cols-2">
       <Card>

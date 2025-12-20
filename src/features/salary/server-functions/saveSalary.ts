@@ -37,5 +37,29 @@ export async function saveSalary(input: SaveSalaryInput) {
     })
     .returning();
 
-  return result[0];
+  const saved = result[0];
+  if (!saved) {
+    throw new Error("Failed to save salary");
+  }
+
+  // 직전년도 연봉 조회하여 성장률 계산
+  const prevYearSalary = await db
+    .select()
+    .from(salary)
+    .where(and(eq(salary.userId, userId), eq(salary.year, year - 1)))
+    .limit(1);
+
+  let growthRate: number | null = null;
+  if (prevYearSalary[0] && prevYearSalary[0].amount > 0 && amount > 0) {
+    growthRate =
+      ((amount - prevYearSalary[0].amount) / prevYearSalary[0].amount) * 100;
+  }
+
+  return {
+    id: saved.id,
+    year: saved.year,
+    amount: saved.amount,
+    memo: saved.memo,
+    growthRate,
+  };
 }
