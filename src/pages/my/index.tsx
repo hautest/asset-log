@@ -1,11 +1,11 @@
+import { Suspense } from "react";
 import { getSession } from "@/shared/auth/getSession";
 import { redirect } from "@/shared/router/router";
-import { getCategories } from "@/features/category/queries";
 import { Link } from "waku";
 import { AppHeader } from "@/shared/components/AppHeader";
 import { LogoutButton } from "../dashboard/_components/LogoutButton";
 import { UserInfoCard } from "./_components/UserInfoCard";
-import { CategoryManageCard } from "./_components/CategoryManageCard";
+import { CategoryManageCardSection } from "./_components/CategoryManageCardSection";
 
 export default async function MyPage() {
   const session = await getSession();
@@ -13,8 +13,6 @@ export default async function MyPage() {
   if (!session) {
     return redirect("/login");
   }
-
-  const categories = await getCategories();
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
@@ -41,7 +39,9 @@ export default async function MyPage() {
             email={session.user.email}
             image={session.user.image}
           />
-          <CategoryManageCard categories={categories} />
+          <Suspense fallback={<CategoryManageCardSection.Skeleton />}>
+            <CategoryManageCardSection />
+          </Suspense>
         </div>
       </main>
     </div>
