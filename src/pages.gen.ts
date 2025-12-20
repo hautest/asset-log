@@ -8,6 +8,10 @@ import type { getConfig as File_AssetsYearMonthIndex_getConfig } from './pages/a
 // prettier-ignore
 import type { getConfig as File_DashboardIndex_getConfig } from './pages/dashboard/index';
 // prettier-ignore
+import type { getConfig as File_DashboardMonthlyIndex_getConfig } from './pages/dashboard/monthly/index';
+// prettier-ignore
+import type { getConfig as File_DashboardSalaryIndex_getConfig } from './pages/dashboard/salary/index';
+// prettier-ignore
 import type { getConfig as File_Index_getConfig } from './pages/index';
 // prettier-ignore
 import type { getConfig as File_LoginIndex_getConfig } from './pages/login/index';
@@ -18,6 +22,8 @@ import type { getConfig as File_MyIndex_getConfig } from './pages/my/index';
 type Page =
 | ({ path: '/assets/[yearMonth]' } & GetConfigResponse<typeof File_AssetsYearMonthIndex_getConfig>)
 | ({ path: '/dashboard' } & GetConfigResponse<typeof File_DashboardIndex_getConfig>)
+| ({ path: '/dashboard/monthly' } & GetConfigResponse<typeof File_DashboardMonthlyIndex_getConfig>)
+| ({ path: '/dashboard/salary' } & GetConfigResponse<typeof File_DashboardSalaryIndex_getConfig>)
 | ({ path: '/' } & GetConfigResponse<typeof File_Index_getConfig>)
 | ({ path: '/login' } & GetConfigResponse<typeof File_LoginIndex_getConfig>)
 | ({ path: '/my' } & GetConfigResponse<typeof File_MyIndex_getConfig>);
