@@ -1,8 +1,6 @@
 import { Suspense } from "react";
 import { getSession } from "@/shared/auth/getSession";
 import { redirect } from "@/shared/router/router";
-import { Link } from "waku";
-import { AppHeader } from "@/shared/components/AppHeader";
 import { AssetEditorSection } from "./_components/AssetEditorSection";
 
 interface AssetDetailPageProps {

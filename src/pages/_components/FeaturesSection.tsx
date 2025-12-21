@@ -5,7 +5,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/shared/ui/card";
-import { Wallet, BarChart3, TrendingUp } from "lucide-react";
+import { Wallet, BarChart3, TrendingUp, Banknote } from "lucide-react";
 
 const FEATURES = [
   {
@@ -26,6 +26,12 @@ const FEATURES = [
     description:
       "작년 대비, 지난달 대비 내 자산이 얼마나 늘었는지 한눈에 확인하세요.",
   },
+  {
+    icon: Banknote,
+    title: "연봉 추이 관리",
+    description:
+      "연도별 연봉을 기록하고, 직전년도 대비 인상률을 한눈에 파악하세요.",
+  },
 ] as const;
 
 export function FeaturesSection() {
@@ -40,7 +46,7 @@ export function FeaturesSection() {
             기존 자산 관리 앱이 해결하지 못한 문제를 해결합니다
           </p>
         </div>
-        <div className="grid gap-8 md:grid-cols-3">
+        <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4">
           {FEATURES.map((feature) => (
             <Card
               key={feature.title}
