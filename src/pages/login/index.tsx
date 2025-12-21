@@ -9,6 +9,7 @@ import {
 import { GoogleLoginButton } from "./_components/GoogleLoginButton";
 import { getSession } from "@/shared/auth/getSession";
 import { redirect } from "@/shared/router/router";
+import { Seo } from "@/shared/components/Seo";
 
 export default async function LoginPage() {
   const session = await getSession();
@@ -19,6 +20,7 @@ export default async function LoginPage() {
 
   return (
     <main className="flex min-h-screen items-center justify-center bg-gray-50 px-4 py-8 sm:px-6 lg:px-8">
+      <Seo title="로그인" noIndex />
       <Card className="w-full max-w-md">
         <CardHeader className="text-center space-y-2 sm:space-y-3">
           <CardTitle className="text-2xl font-bold tracking-tight sm:text-3xl">

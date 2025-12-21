@@ -1,8 +1,7 @@
 import { Suspense } from "react";
 import { getSession } from "@/shared/auth/getSession";
 import { redirect } from "@/shared/router/router";
-import { Link } from "waku";
-import { AppHeader } from "@/shared/components/AppHeader";
+import { Seo } from "@/shared/components/Seo";
 import { AssetEditorSection } from "./_components/AssetEditorSection";
 
 interface AssetDetailPageProps {
@@ -33,12 +32,13 @@ export default async function AssetDetailPage({
     return redirect("/dashboard");
   }
 
+  const pageTitle = `${formatYearMonth(yearMonth)} 자산 등록`;
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
+      <Seo title={pageTitle} noIndex />
       <main className="mx-auto max-w-4xl px-4 py-8">
-        <h1 className="mb-8 text-2xl font-bold text-slate-900">
-          {formatYearMonth(yearMonth)} 자산 등록
-        </h1>
+        <h1 className="mb-8 text-2xl font-bold text-slate-900">{pageTitle}</h1>
 
         <Suspense fallback={<AssetEditorSection.Skeleton />}>
           <AssetEditorSection yearMonth={yearMonth} />

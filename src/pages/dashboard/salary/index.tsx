@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import { getSession } from "@/shared/auth/getSession";
 import { redirect } from "@/shared/router/router";
+import { Seo } from "@/shared/components/Seo";
 import { SalaryChartSection } from "./_components/SalaryChartSection";
 
 interface SalaryPageProps {
@@ -23,6 +24,7 @@ export default async function SalaryPage({ query }: SalaryPageProps) {
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-8">
+      <Seo title="연봉 추이" noIndex />
       <h1 className="mb-8 text-2xl font-bold text-slate-900">연봉 추이</h1>
 
       <Suspense fallback={<SalaryChartSection.Skeleton />}>
