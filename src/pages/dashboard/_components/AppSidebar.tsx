@@ -13,6 +13,7 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  useSidebar,
 } from "@/shared/ui/sidebar";
 import { authClient } from "@/shared/auth/authClient";
 
@@ -31,9 +32,15 @@ const MENU_ITEMS = [
 
 export function AppSidebar() {
   const router = useRouter();
+  const { setOpenMobile } = useSidebar();
   const currentPath = router.path.split("?")[0];
 
+  const handleLinkClick = () => {
+    setOpenMobile(false);
+  };
+
   const handleLogout = async () => {
+    setOpenMobile(false);
     await authClient.signOut();
     router.replace("/");
   };
@@ -41,7 +48,7 @@ export function AppSidebar() {
   return (
     <Sidebar collapsible="icon">
       <SidebarHeader className="border-b">
-        <Link to="/dashboard" className="flex items-center gap-2">
+        <Link to="/dashboard" className="flex items-center gap-2" onClick={handleLinkClick}>
           <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-emerald-600">
             <BarChart3 className="h-4 w-4 text-white" />
           </div>
@@ -61,7 +68,7 @@ export function AppSidebar() {
                     asChild
                     isActive={currentPath === item.url}
                   >
-                    <Link to={item.url}>
+                    <Link to={item.url} onClick={handleLinkClick}>
                       <item.icon />
                       <span>{item.title}</span>
                     </Link>
@@ -76,7 +83,7 @@ export function AppSidebar() {
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton asChild isActive={currentPath === "/my"}>
-              <Link to="/my">
+              <Link to="/my" onClick={handleLinkClick}>
                 <User />
                 <span>마이페이지</span>
               </Link>
