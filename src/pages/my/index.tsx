@@ -3,6 +3,7 @@ import { getSession } from "@/shared/auth/getSession";
 import { redirect } from "@/shared/router/router";
 import { Link } from "waku";
 import { AppHeader } from "@/shared/components/AppHeader";
+import { Seo } from "@/shared/components/Seo";
 import { LogoutButton } from "./_components/LogoutButton";
 import { UserInfoCard } from "./_components/UserInfoCard";
 import { CategoryManageCardSection } from "./_components/CategoryManageCardSection";
@@ -16,6 +17,7 @@ export default async function MyPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
+      <Seo title="마이페이지" noIndex />
       <AppHeader
         rightNode={
           <>
