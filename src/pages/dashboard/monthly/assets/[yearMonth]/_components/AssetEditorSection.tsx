@@ -1,5 +1,8 @@
 import { getCategories } from "@/features/category/queries";
-import { getSnapshotByYearMonth } from "@/features/asset/queries";
+import {
+  getSnapshotByYearMonth,
+  getAllCompletedSnapshots,
+} from "@/features/asset/queries";
 import { Card, CardContent, CardFooter, CardHeader } from "@/shared/ui/card";
 import { Skeleton } from "@/shared/ui/skeleton";
 import { AssetEditor } from "./AssetEditor";
@@ -9,9 +12,10 @@ interface AssetEditorSectionProps {
 }
 
 async function AssetEditorSection({ yearMonth }: AssetEditorSectionProps) {
-  const [categories, snapshot] = await Promise.all([
+  const [categories, snapshot, availableSnapshots] = await Promise.all([
     getCategories(),
     getSnapshotByYearMonth(yearMonth),
+    getAllCompletedSnapshots(yearMonth),
   ]);
 
   const existingAssets = snapshot?.assets ?? [];
@@ -22,6 +26,7 @@ async function AssetEditorSection({ yearMonth }: AssetEditorSectionProps) {
       categories={categories}
       existingAssets={existingAssets}
       snapshotMemo={snapshot?.memo ?? null}
+      availableSnapshots={availableSnapshots}
     />
   );
 }

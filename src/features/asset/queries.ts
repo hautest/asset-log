@@ -1,6 +1,6 @@
 import { db } from "@/shared/db/db";
 import { monthlySnapshot, asset, category } from "@/shared/db/schema";
-import { eq, and, asc, inArray, like } from "drizzle-orm";
+import { eq, and, asc, inArray, like, desc } from "drizzle-orm";
 import { getSession } from "@/shared/auth/getSession";
 
 export async function getSnapshotByYearMonth(yearMonth: string) {
@@ -137,4 +137,31 @@ export async function getYearSnapshotsWithAssets(
       categories: {},
     };
   });
+}
+
+export async function getAllCompletedSnapshots(excludeYearMonth?: string) {
+  const session = await getSession();
+  if (!session) {
+    throw new Error("Unauthorized");
+  }
+
+  const snapshots = await db
+    .select({
+      yearMonth: monthlySnapshot.yearMonth,
+      totalAmount: monthlySnapshot.totalAmount,
+    })
+    .from(monthlySnapshot)
+    .where(
+      and(
+        eq(monthlySnapshot.userId, session.user.id),
+        eq(monthlySnapshot.status, "completed")
+      )
+    )
+    .orderBy(desc(monthlySnapshot.yearMonth));
+
+  if (excludeYearMonth) {
+    return snapshots.filter((s) => s.yearMonth !== excludeYearMonth);
+  }
+
+  return snapshots;
 }

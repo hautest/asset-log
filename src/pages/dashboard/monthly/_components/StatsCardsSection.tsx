@@ -14,18 +14,40 @@ interface StatsCardsSectionProps {
   selectedYear: number;
 }
 
-const calculateGrowth = (snapshots: MonthData[]) => {
-  const completedSnapshots = snapshots.filter((s) => s.status === "completed");
-  if (completedSnapshots.length < 2) return 0;
+const calculateGrowth = (
+  currentSnapshots: MonthData[],
+  previousYearSnapshots: MonthData[]
+) => {
+  const completedSnapshots = currentSnapshots.filter(
+    (s) => s.status === "completed"
+  );
+  if (completedSnapshots.length === 0) return 0;
 
   const latest = completedSnapshots[completedSnapshots.length - 1];
-  const previous = completedSnapshots[completedSnapshots.length - 2];
+  if (!latest) return 0;
 
-  if (!latest || !previous || previous.totalAmount === 0) return 0;
+  if (completedSnapshots.length >= 2) {
+    const previous = completedSnapshots[completedSnapshots.length - 2];
+    if (!previous || previous.totalAmount === 0) return 0;
+    return (
+      ((latest.totalAmount - previous.totalAmount) / previous.totalAmount) * 100
+    );
+  }
 
-  return (
-    ((latest.totalAmount - previous.totalAmount) / previous.totalAmount) * 100
-  );
+  const latestMonth = parseInt(latest.yearMonth.split("-")[1] ?? "0");
+  if (latestMonth === 1) {
+    const previousDecember = previousYearSnapshots.find(
+      (s) => s.yearMonth.endsWith("-12") && s.status === "completed"
+    );
+    if (!previousDecember || previousDecember.totalAmount === 0) return 0;
+    return (
+      ((latest.totalAmount - previousDecember.totalAmount) /
+        previousDecember.totalAmount) *
+      100
+    );
+  }
+
+  return 0;
 };
 
 const calculateYearOverYearGrowth = (
@@ -57,7 +79,7 @@ async function StatsCardsSection({ selectedYear }: StatsCardsSectionProps) {
   ]);
 
   const latestSnapshot = yearData.filter((s) => s.status === "completed").pop();
-  const growth = calculateGrowth(yearData);
+  const growth = calculateGrowth(yearData, previousYearData);
   const yearOverYearGrowth = calculateYearOverYearGrowth(
     yearData,
     previousYearData
