@@ -16,8 +16,10 @@ import {
 } from "@/shared/ui/table";
 import { Trash2 } from "lucide-react";
 import { saveAssets } from "@/features/asset/server-functions/saveAssets";
+import { getSnapshotAssets } from "@/features/asset/server-functions/getSnapshotAssets";
 import { toast } from "sonner";
 import { formatCurrency } from "@/shared/utils/formatCurrency";
+import { AssetCompareDialog } from "./AssetCompareDialog";
 
 interface Category {
   id: string;
@@ -35,11 +37,17 @@ interface ExistingAsset {
   memo: string | null;
 }
 
+interface SnapshotOption {
+  yearMonth: string;
+  totalAmount: number;
+}
+
 interface AssetEditorProps {
   yearMonth: string;
   categories: Category[];
   existingAssets: ExistingAsset[];
   snapshotMemo: string | null;
+  availableSnapshots: SnapshotOption[];
 }
 
 interface AssetRow {
@@ -55,6 +63,7 @@ export function AssetEditor({
   categories,
   existingAssets,
   snapshotMemo,
+  availableSnapshots,
 }: AssetEditorProps) {
   const router = useRouter();
   const [isSaving, setIsSaving] = useState(false);
@@ -206,7 +215,16 @@ export function AssetEditor({
         </Table>
 
         <div className="mt-6 flex items-center justify-between border-t pt-4">
-          <span className="text-lg font-semibold">합계</span>
+          <div className="flex items-center gap-3">
+            <span className="text-lg font-semibold">합계</span>
+            <AssetCompareDialog
+              currentYearMonth={yearMonth}
+              currentAssets={rows}
+              currentTotalAmount={totalAmount}
+              availableSnapshots={availableSnapshots}
+              getSnapshotAssets={getSnapshotAssets}
+            />
+          </div>
           <span className="text-xl font-bold">
             {formatCurrency(totalAmount)}
           </span>
