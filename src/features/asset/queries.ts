@@ -1,6 +1,6 @@
 import { db } from "@/shared/db/db";
 import { monthlySnapshot, asset, category } from "@/shared/db/schema";
-import { eq, and, asc, inArray, desc } from "drizzle-orm";
+import { eq, and, asc, inArray, desc, like } from "drizzle-orm";
 import { getSession } from "@/shared/auth/getSession";
 import { cacheLife, cacheTag } from "next/cache";
 
@@ -69,7 +69,7 @@ async function getYearSnapshotsCached(userId: string, year: number) {
     .where(
       and(
         eq(monthlySnapshot.userId, userId),
-        eq(monthlySnapshot.yearMonth, `${year}-%`)
+        like(monthlySnapshot.yearMonth, `${year}-%`)
       )
     );
 }
