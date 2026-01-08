@@ -1,14 +1,13 @@
 import { db } from "@/shared/db/db";
 import { monthlySnapshot, asset, category } from "@/shared/db/schema";
-import { eq, and, asc, inArray, like, desc } from "drizzle-orm";
+import { eq, and, asc, inArray, desc } from "drizzle-orm";
 import { getSession } from "@/shared/auth/getSession";
+import { cacheLife, cacheTag } from "next/cache";
 
-export async function getSnapshotByYearMonth(yearMonth: string) {
-  const session = await getSession();
-  if (!session) {
-    throw new Error("Unauthorized");
-  }
-  const userId = session.user.id;
+async function getSnapshotByYearMonthCached(userId: string, yearMonth: string) {
+  "use cache";
+  cacheLife("hours");
+  cacheTag(`assets-${userId}`);
 
   const snapshot = await db
     .select()
@@ -51,21 +50,36 @@ export async function getSnapshotByYearMonth(yearMonth: string) {
   };
 }
 
-export async function getYearSnapshots(year: number) {
+export async function getSnapshotByYearMonth(yearMonth: string) {
   const session = await getSession();
   if (!session) {
     throw new Error("Unauthorized");
   }
+  return getSnapshotByYearMonthCached(session.user.id, yearMonth);
+}
+
+async function getYearSnapshotsCached(userId: string, year: number) {
+  "use cache";
+  cacheLife("hours");
+  cacheTag(`assets-${userId}`);
 
   return db
     .select()
     .from(monthlySnapshot)
     .where(
       and(
-        eq(monthlySnapshot.userId, session.user.id),
-        like(monthlySnapshot.yearMonth, `${year}-%`)
+        eq(monthlySnapshot.userId, userId),
+        eq(monthlySnapshot.yearMonth, `${year}-%`)
       )
     );
+}
+
+export async function getYearSnapshots(year: number) {
+  const session = await getSession();
+  if (!session) {
+    throw new Error("Unauthorized");
+  }
+  return getYearSnapshotsCached(session.user.id, year);
 }
 
 interface MonthData {
@@ -75,14 +89,13 @@ interface MonthData {
   categories: Record<string, number>;
 }
 
-export async function getYearSnapshotsWithAssets(
+async function getYearSnapshotsWithAssetsCached(
+  userId: string,
   year: number
 ): Promise<MonthData[]> {
-  const session = await getSession();
-  if (!session) {
-    throw new Error("Unauthorized");
-  }
-  const userId = session.user.id;
+  "use cache";
+  cacheLife("hours");
+  cacheTag(`assets-${userId}`);
 
   const snapshots = await db
     .select()
@@ -139,11 +152,23 @@ export async function getYearSnapshotsWithAssets(
   });
 }
 
-export async function getAllCompletedSnapshots(excludeYearMonth?: string) {
+export async function getYearSnapshotsWithAssets(
+  year: number
+): Promise<MonthData[]> {
   const session = await getSession();
   if (!session) {
     throw new Error("Unauthorized");
   }
+  return getYearSnapshotsWithAssetsCached(session.user.id, year);
+}
+
+async function getAllCompletedSnapshotsCached(
+  userId: string,
+  excludeYearMonth?: string
+) {
+  "use cache";
+  cacheLife("hours");
+  cacheTag(`assets-${userId}`);
 
   const snapshots = await db
     .select({
@@ -153,7 +178,7 @@ export async function getAllCompletedSnapshots(excludeYearMonth?: string) {
     .from(monthlySnapshot)
     .where(
       and(
-        eq(monthlySnapshot.userId, session.user.id),
+        eq(monthlySnapshot.userId, userId),
         eq(monthlySnapshot.status, "completed")
       )
     )
@@ -164,4 +189,12 @@ export async function getAllCompletedSnapshots(excludeYearMonth?: string) {
   }
 
   return snapshots;
+}
+
+export async function getAllCompletedSnapshots(excludeYearMonth?: string) {
+  const session = await getSession();
+  if (!session) {
+    throw new Error("Unauthorized");
+  }
+  return getAllCompletedSnapshotsCached(session.user.id, excludeYearMonth);
 }

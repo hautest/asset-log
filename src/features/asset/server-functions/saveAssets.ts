@@ -5,6 +5,7 @@ import { monthlySnapshot, asset, category } from "@/shared/db/schema";
 import { getSession } from "@/shared/auth/getSession";
 import { eq, and, inArray } from "drizzle-orm";
 import { nanoid } from "nanoid";
+import { updateTag } from "next/cache";
 
 interface AssetInput {
   categoryId: string;
@@ -88,6 +89,8 @@ export async function saveAssets(input: SaveAssetsInput) {
 
     return actualSnapshotId;
   });
+
+  updateTag(`assets-${userId}`);
 
   return { success: true, snapshotId: result };
 }

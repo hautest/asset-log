@@ -5,6 +5,7 @@ import { category } from "@/shared/db/schema";
 import { getSession } from "@/shared/auth/getSession";
 import { eq, desc } from "drizzle-orm";
 import { nanoid } from "nanoid";
+import { updateTag } from "next/cache";
 
 interface CreateCategoryInput {
   name: string;
@@ -41,6 +42,8 @@ export async function createCategory(input: CreateCategoryInput) {
       sortOrder: nextSortOrder,
     })
     .returning();
+
+  updateTag(`categories-${userId}`);
 
   return newCategory;
 }

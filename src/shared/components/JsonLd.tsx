@@ -1,3 +1,18 @@
+import type { WithContext, WebApplication, Organization } from "schema-dts";
+
+interface JsonLdProps<T> {
+  data: T;
+}
+
+function JsonLd<T>({ data }: JsonLdProps<T>) {
+  return (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(data) }}
+    />
+  );
+}
+
 interface WebApplicationJsonLdProps {
   name: string;
   description: string;
@@ -9,7 +24,7 @@ export function WebApplicationJsonLd({
   description,
   url,
 }: WebApplicationJsonLdProps) {
-  const jsonLd = {
+  const jsonLd: WithContext<WebApplication> = {
     "@context": "https://schema.org",
     "@type": "WebApplication",
     name,
@@ -24,12 +39,7 @@ export function WebApplicationJsonLd({
     },
   };
 
-  return (
-    <script
-      type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-    />
-  );
+  return <JsonLd data={jsonLd} />;
 }
 
 interface OrganizationJsonLdProps {
@@ -43,7 +53,7 @@ export function OrganizationJsonLd({
   url,
   logo,
 }: OrganizationJsonLdProps) {
-  const jsonLd = {
+  const jsonLd: WithContext<Organization> = {
     "@context": "https://schema.org",
     "@type": "Organization",
     name,
@@ -51,10 +61,5 @@ export function OrganizationJsonLd({
     ...(logo && { logo }),
   };
 
-  return (
-    <script
-      type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-    />
-  );
+  return <JsonLd data={jsonLd} />;
 }
