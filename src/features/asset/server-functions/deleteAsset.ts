@@ -4,6 +4,7 @@ import { db } from "@/shared/db/db";
 import { monthlySnapshot, asset } from "@/shared/db/schema";
 import { getSession } from "@/shared/auth/getSession";
 import { eq, and, sum } from "drizzle-orm";
+import { updateTag } from "next/cache";
 
 export async function deleteAsset(assetId: string) {
   const session = await getSession();
@@ -53,6 +54,8 @@ export async function deleteAsset(assetId: string) {
       })
       .where(eq(monthlySnapshot.id, snapshotId));
   });
+
+  updateTag(`assets-${userId}`);
 
   return { success: true };
 }

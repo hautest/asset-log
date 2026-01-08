@@ -4,6 +4,7 @@ import { db } from "@/shared/db/db";
 import { category } from "@/shared/db/schema";
 import { getSession } from "@/shared/auth/getSession";
 import { eq, and } from "drizzle-orm";
+import { updateTag } from "next/cache";
 
 export async function reorderCategories(orderedIds: string[]) {
   const session = await getSession();
@@ -21,12 +22,12 @@ export async function reorderCategories(orderedIds: string[]) {
         await tx
           .update(category)
           .set({ sortOrder: i })
-          .where(
-            and(eq(category.id, categoryId), eq(category.userId, userId))
-          );
+          .where(and(eq(category.id, categoryId), eq(category.userId, userId)));
       }
     }
   });
+
+  updateTag(`categories-${userId}`);
 
   return { success: true };
 }

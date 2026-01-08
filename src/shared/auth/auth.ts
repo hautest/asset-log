@@ -1,8 +1,7 @@
-import { betterAuth, BetterAuthPlugin } from "better-auth";
+import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { db } from "../db/db";
 import { createAuthMiddleware } from "better-auth/api";
-import { unstable_getContextData } from "waku/server";
 import { category } from "../db/schema";
 import { nanoid } from "nanoid";
 import { eq } from "drizzle-orm";
@@ -31,10 +30,9 @@ export const auth = betterAuth({
   }),
   secret: BETTER_AUTH_SECRET,
   baseURL: process.env.BETTER_AUTH_URL || "http://localhost:3000",
-  plugins: [wakuCookies()],
   session: {
-    expiresIn: 60 * 60 * 24 * 7, // 7일
-    updateAge: 60 * 60 * 24, // 1일
+    expiresIn: 60 * 60 * 24 * 7,
+    updateAge: 60 * 60 * 24,
   },
   socialProviders: {
     google: {
@@ -50,16 +48,13 @@ export const auth = betterAuth({
         if (newSession?.user) {
           const userId = newSession.user.id;
 
-          // 이미 카테고리가 있는지 확인
           const existingCategories = await db
             .select()
             .from(category)
             .where(eq(category.userId, userId))
             .limit(1);
 
-          // 카테고리가 없으면 기본 카테고리 생성 (= 새 사용자)
           if (existingCategories.length === 0) {
-            console.log("Creating default categories for new user:", userId);
             await Promise.all(
               DEFAULT_CATEGORIES.map((cat) =>
                 db.insert(category).values({
@@ -81,30 +76,3 @@ export const auth = betterAuth({
 
 export type Session = typeof auth.$Infer.Session.session;
 export type User = typeof auth.$Infer.Session.user;
-
-function wakuCookies() {
-  return {
-    id: "waku-cookies",
-    hooks: {
-      after: [
-        {
-          matcher(ctx) {
-            return true;
-          },
-          handler: createAuthMiddleware(async (ctx) => {
-            const returned = ctx.context.responseHeaders;
-            if ("_flag" in ctx && ctx._flag === "router") {
-              return;
-            }
-            if (returned instanceof Headers) {
-              const setCookieHeader = returned?.get("set-cookie");
-              if (!setCookieHeader) return;
-              const contextData = unstable_getContextData();
-              contextData.betterAuthSetCookie = setCookieHeader;
-            }
-          }),
-        },
-      ],
-    },
-  } satisfies BetterAuthPlugin;
-}

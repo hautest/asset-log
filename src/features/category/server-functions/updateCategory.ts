@@ -4,6 +4,7 @@ import { db } from "@/shared/db/db";
 import { category } from "@/shared/db/schema";
 import { getSession } from "@/shared/auth/getSession";
 import { eq, and } from "drizzle-orm";
+import { updateTag } from "next/cache";
 
 interface UpdateCategoryInput {
   id: string;
@@ -40,6 +41,8 @@ export async function updateCategory(input: UpdateCategoryInput) {
   if (!updated) {
     throw new Error("Category not found");
   }
+
+  updateTag(`categories-${userId}`);
 
   return updated;
 }

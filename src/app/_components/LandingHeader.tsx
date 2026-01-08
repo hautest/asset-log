@@ -1,12 +1,12 @@
-import { type ReactNode } from "react";
 import Link from "next/link";
 import { BarChart3 } from "lucide-react";
+import { Button } from "@/shared/ui/button";
 
-interface AppHeaderProps {
-  rightNode?: ReactNode;
+interface LandingHeaderProps {
+  isLoggedIn: boolean;
 }
 
-export function AppHeader({ rightNode }: AppHeaderProps) {
+export function LandingHeader({ isLoggedIn }: LandingHeaderProps) {
   return (
     <header className="sticky top-0 z-50 border-b border-slate-200/60 bg-white/80 backdrop-blur-md">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
@@ -18,9 +18,17 @@ export function AppHeader({ rightNode }: AppHeaderProps) {
             자산로그
           </span>
         </Link>
-        {rightNode && (
-          <div className="flex items-center gap-3">{rightNode}</div>
-        )}
+        <nav className="flex items-center gap-3">
+          {isLoggedIn ? (
+            <Link href="/dashboard">
+              <Button>대시보드</Button>
+            </Link>
+          ) : (
+            <Link href="/login">
+              <Button>시작하기</Button>
+            </Link>
+          )}
+        </nav>
       </div>
     </header>
   );

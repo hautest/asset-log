@@ -4,6 +4,7 @@ import { db } from "@/shared/db/db";
 import { category, asset } from "@/shared/db/schema";
 import { getSession } from "@/shared/auth/getSession";
 import { eq, and } from "drizzle-orm";
+import { updateTag } from "next/cache";
 
 export async function deleteCategory(id: string) {
   const session = await getSession();
@@ -32,6 +33,8 @@ export async function deleteCategory(id: string) {
   if (!deleted) {
     throw new Error("Category not found");
   }
+
+  updateTag(`categories-${userId}`);
 
   return deleted;
 }

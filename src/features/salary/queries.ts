@@ -2,6 +2,7 @@ import { db } from "@/shared/db/db";
 import { salary } from "@/shared/db/schema";
 import { eq, and, gte, lte, desc, asc } from "drizzle-orm";
 import { getSession } from "@/shared/auth/getSession";
+import { cacheLife, cacheTag } from "next/cache";
 
 export interface SalaryData {
   id: string;
@@ -11,23 +12,19 @@ export interface SalaryData {
   growthRate: number | null;
 }
 
-export async function getSalariesByRange(
+async function getSalariesByRangeCached(
+  userId: string,
   startYear: number,
   endYear: number
 ): Promise<SalaryData[]> {
-  const session = await getSession();
-  if (!session) {
-    throw new Error("Unauthorized");
-  }
-
-  const userId = session.user.id;
+  "use cache";
+  cacheLife("hours");
+  cacheTag(`salaries-${userId}`);
 
   const previousYearSalary = await db
     .select()
     .from(salary)
-    .where(
-      and(eq(salary.userId, userId), eq(salary.year, startYear - 1))
-    )
+    .where(and(eq(salary.userId, userId), eq(salary.year, startYear - 1)))
     .limit(1);
 
   const salaries = await db
@@ -83,17 +80,25 @@ export async function getSalariesByRange(
   return result;
 }
 
-export async function getLatestSalary(): Promise<{
-  amount: number;
-  year: number;
-  growthRate: number | null;
-} | null> {
+export async function getSalariesByRange(
+  startYear: number,
+  endYear: number
+): Promise<SalaryData[]> {
   const session = await getSession();
   if (!session) {
     throw new Error("Unauthorized");
   }
+  return getSalariesByRangeCached(session.user.id, startYear, endYear);
+}
 
-  const userId = session.user.id;
+async function getLatestSalaryCached(userId: string): Promise<{
+  amount: number;
+  year: number;
+  growthRate: number | null;
+} | null> {
+  "use cache";
+  cacheLife("hours");
+  cacheTag(`salaries-${userId}`);
 
   const salaries = await db
     .select()
@@ -119,6 +124,18 @@ export async function getLatestSalary(): Promise<{
     year: latest.year,
     growthRate,
   };
+}
+
+export async function getLatestSalary(): Promise<{
+  amount: number;
+  year: number;
+  growthRate: number | null;
+} | null> {
+  const session = await getSession();
+  if (!session) {
+    throw new Error("Unauthorized");
+  }
+  return getLatestSalaryCached(session.user.id);
 }
 
 const queryKey = ["salaries"];
