@@ -7,6 +7,7 @@ import { FeaturesSection } from "./_components/FeaturesSection";
 import { StepsSection } from "./_components/StepsSection";
 import { BenefitsSection } from "./_components/BenefitsSection";
 import { SalarySection } from "./_components/SalarySection";
+import { PortfolioSection } from "./_components/PortfolioSection";
 import { CTASection } from "./_components/CTASection";
 import { LandingFooter } from "./_components/LandingFooter";
 
@@ -36,6 +37,8 @@ export default async function HomePage() {
       <BenefitsSection />
       <Separator />
       <SalarySection />
+      <Separator />
+      <PortfolioSection />
       <Separator />
       <CTASection isLoggedIn={isLoggedIn} />
       <LandingFooter />

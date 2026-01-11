@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
-import { BarChart3, Calendar, Banknote, User, LogOut } from "lucide-react";
+import { BarChart3, Calendar, Banknote, User, LogOut, PieChart } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -28,6 +28,11 @@ const MENU_ITEMS = [
     title: "연봉 추이",
     url: "/dashboard/salary" as const,
     icon: Banknote,
+  },
+  {
+    title: "포트폴리오 분석",
+    url: "/dashboard/portfolio" as const,
+    icon: PieChart,
   },
 ];
 

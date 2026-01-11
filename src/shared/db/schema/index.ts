@@ -219,6 +219,7 @@ export const userRelations = relations(user, ({ many }) => ({
   categories: many(category),
   monthlySnapshots: many(monthlySnapshot),
   salaries: many(salary),
+  portfolios: many(portfolio),
 }));
 
 // Salary Table
@@ -249,5 +250,59 @@ export const salaryRelations = relations(salary, ({ one }) => ({
   user: one(user, {
     fields: [salary.userId],
     references: [user.id],
+  }),
+}));
+
+// Portfolio Tables
+
+export const portfolio = pgTable(
+  "portfolio",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    name: text("name").notNull(),
+    description: text("description"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at")
+      .defaultNow()
+      .$onUpdate(() => new Date())
+      .notNull(),
+  },
+  (table) => [index("portfolio_userId_idx").on(table.userId)]
+);
+
+export const portfolioItem = pgTable(
+  "portfolio_item",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    portfolioId: uuid("portfolio_id")
+      .notNull()
+      .references(() => portfolio.id, { onDelete: "cascade" }),
+    ticker: text("ticker").notNull(),
+    name: text("name").notNull(),
+    weight: integer("weight").notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at")
+      .defaultNow()
+      .$onUpdate(() => new Date())
+      .notNull(),
+  },
+  (table) => [index("portfolioItem_portfolioId_idx").on(table.portfolioId)]
+);
+
+export const portfolioRelations = relations(portfolio, ({ one, many }) => ({
+  user: one(user, {
+    fields: [portfolio.userId],
+    references: [user.id],
+  }),
+  items: many(portfolioItem),
+}));
+
+export const portfolioItemRelations = relations(portfolioItem, ({ one }) => ({
+  portfolio: one(portfolio, {
+    fields: [portfolioItem.portfolioId],
+    references: [portfolio.id],
   }),
 }));
