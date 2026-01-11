@@ -4,14 +4,15 @@ import { useState } from "react";
 import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/shared/ui/card";
 import { Button } from "@/shared/ui/button";
-import { Input } from "@/shared/ui/input";
 import { Label } from "@/shared/ui/label";
-import { ArrowLeft, Pencil, Loader2, TrendingUp, TrendingDown, Activity } from "lucide-react";
+import { DatePicker } from "@/shared/ui/date-picker";
+import { ArrowLeft, Pencil, Loader2, Activity } from "lucide-react";
 import { PortfolioFormDialog } from "../../_components/PortfolioFormDialog";
 import { analyzePortfolioAction } from "@/features/portfolio/server-functions/analyzePortfolio";
 import { toast } from "sonner";
 import { AnalysisResult } from "./AnalysisResult";
 import type { PortfolioAnalysis } from "@/features/portfolio/analysis";
+import { useRouter } from "next/navigation";
 
 interface PortfolioItem {
   id: string;
@@ -46,10 +47,14 @@ interface PortfolioDetailProps {
 
 export function PortfolioDetail({ portfolio }: PortfolioDetailProps) {
   const [editOpen, setEditOpen] = useState(false);
-  const [startDate, setStartDate] = useState(getDefaultStartDate());
-  const [endDate, setEndDate] = useState(getDefaultEndDate());
+  const [startDate, setStartDate] = useState<Date | undefined>(
+    getDefaultStartDate()
+  );
+  const [endDate, setEndDate] = useState<Date | undefined>(getDefaultEndDate());
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysisData, setAnalysisData] = useState<AnalysisData | null>(null);
+
+  const router = useRouter();
 
   const handleAnalyze = async () => {
     if (!startDate || !endDate) {
@@ -57,7 +62,7 @@ export function PortfolioDetail({ portfolio }: PortfolioDetailProps) {
       return;
     }
 
-    if (new Date(startDate) >= new Date(endDate)) {
+    if (startDate >= endDate) {
       toast.error("시작일은 종료일보다 이전이어야 합니다");
       return;
     }
@@ -66,13 +71,14 @@ export function PortfolioDetail({ portfolio }: PortfolioDetailProps) {
     try {
       const result = await analyzePortfolioAction({
         portfolioId: portfolio.id,
-        startDate,
-        endDate,
+        startDate: formatDateToString(startDate),
+        endDate: formatDateToString(endDate),
       });
       setAnalysisData(result);
       toast.success("분석이 완료되었습니다");
     } catch (error) {
-      const message = error instanceof Error ? error.message : "분석에 실패했습니다";
+      const message =
+        error instanceof Error ? error.message : "분석에 실패했습니다";
       toast.error(message);
     } finally {
       setIsAnalyzing(false);
@@ -82,13 +88,13 @@ export function PortfolioDetail({ portfolio }: PortfolioDetailProps) {
   return (
     <>
       <div className="flex items-center gap-4">
-        <Link href="/dashboard/portfolio">
-          <Button variant="ghost" size="icon">
-            <ArrowLeft className="h-4 w-4" />
-          </Button>
-        </Link>
+        <Button onClick={() => router.back()} variant="ghost" size="icon">
+          <ArrowLeft className="h-4 w-4" />
+        </Button>
         <div className="flex-1">
-          <h1 className="text-2xl font-bold text-slate-900">{portfolio.name}</h1>
+          <h1 className="text-2xl font-bold text-slate-900">
+            {portfolio.name}
+          </h1>
           {portfolio.description && (
             <p className="text-sm text-slate-500">{portfolio.description}</p>
           )}
@@ -169,21 +175,19 @@ export function PortfolioDetail({ portfolio }: PortfolioDetailProps) {
         <CardContent className="space-y-4">
           <div className="grid gap-4 md:grid-cols-3">
             <div className="space-y-2">
-              <Label htmlFor="startDate">시작일</Label>
-              <Input
-                id="startDate"
-                type="date"
+              <Label>시작일</Label>
+              <DatePicker
                 value={startDate}
-                onChange={(e) => setStartDate(e.target.value)}
+                onChange={setStartDate}
+                placeholder="시작일 선택"
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="endDate">종료일</Label>
-              <Input
-                id="endDate"
-                type="date"
+              <Label>종료일</Label>
+              <DatePicker
                 value={endDate}
-                onChange={(e) => setEndDate(e.target.value)}
+                onChange={setEndDate}
+                placeholder="종료일 선택"
               />
             </div>
             <div className="flex items-end">
@@ -229,12 +233,16 @@ export function PortfolioDetail({ portfolio }: PortfolioDetailProps) {
   );
 }
 
-function getDefaultStartDate(): string {
+function getDefaultStartDate(): Date {
   const date = new Date();
   date.setFullYear(date.getFullYear() - 1);
-  return date.toISOString().split("T")[0] ?? "";
+  return date;
 }
 
-function getDefaultEndDate(): string {
-  return new Date().toISOString().split("T")[0] ?? "";
+function getDefaultEndDate(): Date {
+  return new Date();
+}
+
+function formatDateToString(date: Date): string {
+  return date.toISOString().split("T")[0] ?? "";
 }

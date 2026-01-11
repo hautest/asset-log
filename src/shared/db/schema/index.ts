@@ -270,9 +270,7 @@ export const portfolio = pgTable(
       .$onUpdate(() => new Date())
       .notNull(),
   },
-  (table) => [
-    index("portfolio_userId_idx").on(table.userId),
-  ]
+  (table) => [index("portfolio_userId_idx").on(table.userId)]
 );
 
 export const portfolioItem = pgTable(
@@ -291,9 +289,7 @@ export const portfolioItem = pgTable(
       .$onUpdate(() => new Date())
       .notNull(),
   },
-  (table) => [
-    index("portfolioItem_portfolioId_idx").on(table.portfolioId),
-  ]
+  (table) => [index("portfolioItem_portfolioId_idx").on(table.portfolioId)]
 );
 
 export const portfolioRelations = relations(portfolio, ({ one, many }) => ({

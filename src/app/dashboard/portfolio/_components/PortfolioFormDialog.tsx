@@ -258,7 +258,7 @@ export function PortfolioFormDialog({
                         type="number"
                         min={0}
                         max={100}
-                        value={item.weight}
+                        value={item.weight || ""}
                         onChange={(e) =>
                           handleWeightChange(
                             item.ticker,
