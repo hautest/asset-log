@@ -89,8 +89,8 @@ export function AppSidebar() {
       <SidebarFooter className="border-t">
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton asChild isActive={currentPath === "/my"}>
-              <Link href="/my" onClick={handleLinkClick}>
+            <SidebarMenuButton asChild isActive={currentPath === "/dashboard/my"}>
+              <Link href="/dashboard/my" onClick={handleLinkClick}>
                 <User />
                 <span>마이페이지</span>
               </Link>
