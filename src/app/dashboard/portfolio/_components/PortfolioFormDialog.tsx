@@ -17,17 +17,12 @@ import { createPortfolio } from "@/features/portfolio/server-functions/createPor
 import { updatePortfolio } from "@/features/portfolio/server-functions/updatePortfolio";
 import { searchStocksAction } from "@/features/portfolio/server-functions/searchStocks";
 import { toast } from "sonner";
+import type { PortfolioItemInput } from "@/features/portfolio/types";
 
 interface StockResult {
   ticker: string;
   name: string;
   exchange: string;
-}
-
-interface PortfolioItemInput {
-  ticker: string;
-  name: string;
-  weight: number;
 }
 
 interface PortfolioFormDialogProps {
@@ -262,7 +257,7 @@ export function PortfolioFormDialog({
                         onChange={(e) =>
                           handleWeightChange(
                             item.ticker,
-                            parseInt(e.target.value) || 0
+                            Math.max(0, Math.min(100, parseInt(e.target.value) || 0))
                           )
                         }
                         className="w-16 h-8 text-center"

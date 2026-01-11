@@ -6,21 +6,7 @@ import { Button } from "@/shared/ui/button";
 import { Trash2, ArrowRight } from "lucide-react";
 import { deletePortfolio } from "@/features/portfolio/server-functions/deletePortfolio";
 import { toast } from "sonner";
-
-interface PortfolioItem {
-  id: string;
-  ticker: string;
-  name: string;
-  weight: number;
-}
-
-interface Portfolio {
-  id: string;
-  name: string;
-  description: string | null;
-  items: PortfolioItem[];
-  createdAt: Date;
-}
+import type { Portfolio } from "@/features/portfolio/types";
 
 interface PortfolioListProps {
   portfolios: Portfolio[];

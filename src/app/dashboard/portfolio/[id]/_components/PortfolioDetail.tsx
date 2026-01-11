@@ -11,22 +11,8 @@ import { analyzePortfolioAction } from "@/features/portfolio/server-functions/an
 import { toast } from "sonner";
 import { AnalysisResult } from "./AnalysisResult";
 import type { PortfolioAnalysis } from "@/features/portfolio/analysis";
+import type { Portfolio } from "@/features/portfolio/types";
 import { useRouter } from "next/navigation";
-
-interface PortfolioItem {
-  id: string;
-  ticker: string;
-  name: string;
-  weight: number;
-}
-
-interface Portfolio {
-  id: string;
-  name: string;
-  description: string | null;
-  items: PortfolioItem[];
-  createdAt: Date;
-}
 
 interface PriceData {
   date: string;
@@ -123,7 +109,9 @@ export function PortfolioDetail({ portfolio }: PortfolioDetailProps) {
           </CardHeader>
           <CardContent>
             <p className="text-2xl font-bold">
-              {Math.max(...portfolio.items.map((i) => i.weight))}%
+              {portfolio.items.length > 0
+                ? Math.max(...portfolio.items.map((i) => i.weight))
+                : 0}%
             </p>
           </CardContent>
         </Card>
