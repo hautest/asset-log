@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useCallback, type ChangeEvent } from "react";
+import { useState, useRef, useCallback, useEffect, type ChangeEvent } from "react";
 import { Input } from "./input";
 import { cn } from "@/shared/utils";
 
@@ -10,6 +10,19 @@ interface AmountInputProps {
   placeholder?: string;
   className?: string;
   id?: string;
+}
+
+function formatWithCommas(value: string): string {
+  if (!value) return "";
+  const reversed = value.split("").reverse();
+  const withCommas: string[] = [];
+  for (let i = 0; i < reversed.length; i++) {
+    if (i > 0 && i % 3 === 0) {
+      withCommas.push(",");
+    }
+    withCommas.push(reversed[i]!);
+  }
+  return withCommas.reverse().join("");
 }
 
 function formatAmount(value: number): string {
@@ -25,27 +38,34 @@ export function AmountInput({
   id,
 }: AmountInputProps) {
   const inputRef = useRef<HTMLInputElement>(null);
+  const [displayValue, setDisplayValue] = useState(() => formatAmount(value));
+  const isTypingRef = useRef(false);
+
+  useEffect(() => {
+    if (!isTypingRef.current) {
+      setDisplayValue(formatAmount(value));
+    }
+  }, [value]);
 
   const handleChange = useCallback(
     (e: ChangeEvent<HTMLInputElement>) => {
+      isTypingRef.current = true;
       const input = e.target;
       const rawValue = input.value;
       const cursorPosition = input.selectionStart ?? 0;
 
-      // 커서 위치 이전의 숫자 개수 계산
       const beforeCursor = rawValue.slice(0, cursorPosition);
       const digitsBeforeCursor = beforeCursor.replace(/[^0-9]/g, "").length;
 
-      // 숫자만 추출하여 값 업데이트
-      const numericValue = rawValue.replace(/[^0-9]/g, "");
-      const newValue = numericValue ? Number(numericValue) : 0;
-      onChange(newValue);
+      const numericString = rawValue.replace(/[^0-9]/g, "");
+      const formattedValue = formatWithCommas(numericString);
 
-      // 새로운 포맷된 값에서 커서 위치 계산
+      setDisplayValue(formattedValue);
+      onChange(numericString ? Number(numericString) : 0);
+
       requestAnimationFrame(() => {
         if (!inputRef.current) return;
 
-        const formattedValue = formatAmount(newValue);
         let newCursorPosition = 0;
         let digitCount = 0;
 
@@ -60,7 +80,6 @@ export function AmountInput({
           }
         }
 
-        // 모든 숫자를 지운 경우
         if (digitsBeforeCursor === 0) {
           newCursorPosition = 0;
         }
@@ -71,6 +90,11 @@ export function AmountInput({
     [onChange]
   );
 
+  const handleBlur = useCallback(() => {
+    isTypingRef.current = false;
+    setDisplayValue(formatAmount(value));
+  }, [value]);
+
   return (
     <Input
       ref={inputRef}
@@ -78,8 +102,9 @@ export function AmountInput({
       type="text"
       inputMode="numeric"
       placeholder={placeholder}
-      value={formatAmount(value)}
+      value={displayValue}
       onChange={handleChange}
+      onBlur={handleBlur}
       className={cn("text-right", className)}
     />
   );
