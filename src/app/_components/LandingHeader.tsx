@@ -19,15 +19,9 @@ export function LandingHeader({ isLoggedIn }: LandingHeaderProps) {
           </span>
         </Link>
         <nav className="flex items-center gap-3">
-          {isLoggedIn ? (
-            <Link href="/dashboard">
-              <Button>대시보드</Button>
-            </Link>
-          ) : (
-            <Link href="/login">
-              <Button>시작하기</Button>
-            </Link>
-          )}
+          <Link href="/dashboard/monthly">
+            <Button>{isLoggedIn ? "대시보드" : "시작하기"}</Button>
+          </Link>
         </nav>
       </div>
     </header>

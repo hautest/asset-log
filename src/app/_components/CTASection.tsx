@@ -21,29 +21,16 @@ export function CTASection({ isLoggedIn }: CTASectionProps) {
               구글 계정으로 3초 만에 가입하고, 흩어진 내 자산을 한눈에
               모아보세요.
             </p>
-            {isLoggedIn ? (
-              <Link href="/dashboard">
-                <Button
-                  size="lg"
-                  variant="secondary"
-                  className="h-12 px-8 text-base"
-                >
-                  대시보드로 이동
-                  <ChevronRight className="ml-1 h-4 w-4" />
-                </Button>
-              </Link>
-            ) : (
-              <Link href="/login">
-                <Button
-                  size="lg"
-                  variant="secondary"
-                  className="h-12 px-8 text-base"
-                >
-                  무료로 시작하기
-                  <ChevronRight className="ml-1 h-4 w-4" />
-                </Button>
-              </Link>
-            )}
+            <Link href="/dashboard/monthly">
+              <Button
+                size="lg"
+                variant="secondary"
+                className="h-12 px-8 text-base"
+              >
+                {isLoggedIn ? "대시보드로 이동" : "무료로 시작하기"}
+                <ChevronRight className="ml-1 h-4 w-4" />
+              </Button>
+            </Link>
           </CardContent>
         </Card>
       </div>

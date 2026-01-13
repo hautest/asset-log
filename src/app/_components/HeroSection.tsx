@@ -55,21 +55,12 @@ export function HeroSection({ isLoggedIn }: HeroSectionProps) {
             진짜 내 자산의 흐름을 차트로 확인하세요.
           </p>
           <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
-            {isLoggedIn ? (
-              <Link href="/dashboard">
-                <Button size="lg" className="h-12 px-8 text-base">
-                  대시보드로 이동
-                  <ChevronRight className="ml-1 h-4 w-4" />
-                </Button>
-              </Link>
-            ) : (
-              <Link href="/login">
-                <Button size="lg" className="h-12 px-8 text-base">
-                  무료로 시작하기
-                  <ChevronRight className="ml-1 h-4 w-4" />
-                </Button>
-              </Link>
-            )}
+            <Link href="/dashboard/monthly">
+              <Button size="lg" className="h-12 px-8 text-base">
+                {isLoggedIn ? "대시보드로 이동" : "무료로 시작하기"}
+                <ChevronRight className="ml-1 h-4 w-4" />
+              </Button>
+            </Link>
           </div>
         </div>
 
