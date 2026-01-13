@@ -86,7 +86,17 @@ export async function getSalariesByRange(
 ): Promise<SalaryData[]> {
   const session = await getSession();
   if (!session) {
-    throw new Error("Unauthorized");
+    const result: SalaryData[] = [];
+    for (let year = startYear; year <= endYear; year++) {
+      result.push({
+        id: "",
+        year,
+        amount: 0,
+        memo: null,
+        growthRate: null,
+      });
+    }
+    return result;
   }
   return getSalariesByRangeCached(session.user.id, startYear, endYear);
 }
@@ -133,7 +143,7 @@ export async function getLatestSalary(): Promise<{
 } | null> {
   const session = await getSession();
   if (!session) {
-    throw new Error("Unauthorized");
+    return null;
   }
   return getLatestSalaryCached(session.user.id);
 }

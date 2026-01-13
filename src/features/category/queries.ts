@@ -19,7 +19,7 @@ async function getCategoriesCached(userId: string) {
 export async function getCategories() {
   const session = await getSession();
   if (!session) {
-    throw new Error("Unauthorized");
+    return [];
   }
   return getCategoriesCached(session.user.id);
 }

@@ -7,6 +7,7 @@ import {
   ChartTooltipContent,
 } from "@/shared/ui/chart";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid } from "recharts";
+import { useLoginModal } from "@/shared/auth/useLoginModal";
 
 function getActiveIndex(data: unknown): number | null {
   if (typeof data !== "object" || data === null || !("activeIndex" in data)) {
@@ -52,6 +53,7 @@ interface AssetChartProps {
 
 export function AssetChart({ data, categoryList }: AssetChartProps) {
   const router = useRouter();
+  const { isLoggedIn, openModal } = useLoginModal();
 
   const chartData = data.map((snapshot) => {
     const [, month] = snapshot.yearMonth.split("-");
@@ -77,6 +79,11 @@ export function AssetChart({ data, categoryList }: AssetChartProps) {
       <BarChart
         data={chartData}
         onClick={(clickData) => {
+          if (!isLoggedIn) {
+            openModal();
+            return;
+          }
+
           const activeIndex = getActiveIndex(clickData);
           if (activeIndex !== null) {
             const item = chartData[activeIndex];
