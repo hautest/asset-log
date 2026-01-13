@@ -2,6 +2,6 @@ User-agent: *
 Allow: /
 Disallow: /RSC/
 Disallow: /api/
-Disallow: /dashboard/
+Disallow: /dashboard/my
 
-Sitemap: https://asset-log.org/sitemap.xml
+Sitemap: https://assetlog.kr/sitemap.xml
