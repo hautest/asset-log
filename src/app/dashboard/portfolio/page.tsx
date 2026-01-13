@@ -1,8 +1,16 @@
+import type { Metadata } from "next";
 import { Suspense } from "react";
 import { getPortfolios } from "@/features/portfolio/queries";
 import { PortfolioList } from "./_components/PortfolioList";
 import { PortfolioListSkeleton } from "./_components/PortfolioListSkeleton";
 import { CreatePortfolioButton } from "./_components/CreatePortfolioButton";
+
+export const metadata: Metadata = {
+  title: "포트폴리오 분석",
+  description:
+    "나만의 투자 포트폴리오를 구성하고 백테스트 분석을 수행하세요. 자산 배분 전략을 시뮬레이션하여 최적의 투자 비율을 찾아보세요.",
+  robots: { index: true, follow: true },
+};
 
 export default function PortfolioPage() {
   return (

@@ -1,13 +1,13 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
-import { redirect } from "next/navigation";
-import { getSession } from "@/shared/auth/getSession";
 import { StatsCardsSection } from "./_components/StatsCardsSection";
 import { ChartSectionContainer } from "./_components/ChartSectionContainer";
 
 export const metadata: Metadata = {
   title: "월별 자산 추이",
-  robots: { index: false, follow: false },
+  description:
+    "월별 자산 변화를 차트로 한눈에 확인하세요. 카테고리별 자산 구성과 총 자산 추이를 시각화하여 자산 관리를 도와드립니다.",
+  robots: { index: true, follow: true },
 };
 
 interface MonthlyPageProps {
@@ -15,12 +15,6 @@ interface MonthlyPageProps {
 }
 
 export default async function MonthlyPage({ searchParams }: MonthlyPageProps) {
-  const session = await getSession();
-
-  if (!session) {
-    redirect("/login");
-  }
-
   const params = await searchParams;
   const yearParam = params.year;
   const selectedYear = yearParam ? parseInt(yearParam) : new Date().getFullYear();

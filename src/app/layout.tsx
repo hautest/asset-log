@@ -1,7 +1,12 @@
 import type { ReactNode } from "react";
+import { Suspense } from "react";
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { Toaster } from "@/shared/ui/sonner";
+import { getIsLoggedIn } from "@/shared/auth/getSession";
+import { AuthInitializer } from "@/shared/auth/AuthInitializer";
+import { LoginModal } from "@/shared/auth/LoginModal";
+import { LoginModalTrigger } from "@/shared/auth/LoginModalTrigger";
 
 const SITE_URL = "https://assetlog.kr";
 const SITE_NAME = "자산로그";
@@ -64,11 +69,18 @@ interface RootLayoutProps {
   children: ReactNode;
 }
 
-export default function RootLayout({ children }: RootLayoutProps) {
+export default async function RootLayout({ children }: RootLayoutProps) {
+  const isLoggedIn = await getIsLoggedIn();
+
   return (
     <html lang="ko">
       <body className="font-sans antialiased">
+        <AuthInitializer isLoggedIn={isLoggedIn} />
         {children}
+        <LoginModal />
+        <Suspense fallback={null}>
+          <LoginModalTrigger />
+        </Suspense>
         <Toaster />
       </body>
     </html>

@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
-import { redirect } from "next/navigation";
-import { getSession } from "@/shared/auth/getSession";
 import { SalaryChartSection } from "./_components/SalaryChartSection";
 
 export const metadata: Metadata = {
   title: "연봉 추이",
-  robots: { index: false, follow: false },
+  description:
+    "연도별 연봉 변화를 차트로 확인하세요. 연봉 증가율과 추이를 시각화하여 커리어 성장을 한눈에 파악할 수 있습니다.",
+  robots: { index: true, follow: true },
 };
 
 interface SalaryPageProps {
@@ -14,12 +14,6 @@ interface SalaryPageProps {
 }
 
 export default async function SalaryPage({ searchParams }: SalaryPageProps) {
-  const session = await getSession();
-
-  if (!session) {
-    redirect("/login");
-  }
-
   const params = await searchParams;
   const startYearParam = params.startYear;
   const currentYear = new Date().getFullYear();

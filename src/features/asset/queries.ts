@@ -157,7 +157,15 @@ export async function getYearSnapshotsWithAssets(
 ): Promise<MonthData[]> {
   const session = await getSession();
   if (!session) {
-    throw new Error("Unauthorized");
+    return Array.from({ length: 12 }, (_, i) => {
+      const month = String(i + 1).padStart(2, "0");
+      return {
+        yearMonth: `${year}-${month}`,
+        totalAmount: 0,
+        status: "empty" as const,
+        categories: {},
+      };
+    });
   }
   return getYearSnapshotsWithAssetsCached(session.user.id, year);
 }
@@ -194,7 +202,7 @@ async function getAllCompletedSnapshotsCached(
 export async function getAllCompletedSnapshots(excludeYearMonth?: string) {
   const session = await getSession();
   if (!session) {
-    throw new Error("Unauthorized");
+    return [];
   }
   return getAllCompletedSnapshotsCached(session.user.id, excludeYearMonth);
 }

@@ -1,9 +1,11 @@
-import Link from "next/link";
+"use client";
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/shared/ui/card";
 import { Button } from "@/shared/ui/button";
 import { Plus } from "lucide-react";
 import { YearSelector } from "./YearSelector";
 import { AssetChart } from "./AssetChart";
+import { AuthLink } from "@/shared/auth/AuthLink";
 
 interface Category {
   id: string;
@@ -52,12 +54,12 @@ export function ChartSection({
         <AssetChart data={data} categoryList={categoryList} />
 
         <div className="flex justify-center pt-6">
-          <Link href={`/dashboard/monthly/assets/${currentYearMonth}`}>
+          <AuthLink href={`/dashboard/monthly/assets/${currentYearMonth}`}>
             <Button size="lg" className="gap-2">
               <Plus className="h-5 w-5" />
               이번 달 자산 입력하기
             </Button>
-          </Link>
+          </AuthLink>
         </div>
       </CardContent>
     </Card>

@@ -10,6 +10,7 @@ import { SalaryChart } from "./SalaryChart";
 import { SalaryFormDialog } from "./SalaryFormDialog";
 import { SalaryStatsCards } from "./SalaryStatsCards";
 import { saveSalary } from "@/features/salary/server-functions/saveSalary";
+import { useLoginModal } from "@/shared/auth/useLoginModal";
 import type { SalaryData } from "@/features/salary/queries";
 
 interface SalaryPageContentProps {
@@ -32,8 +33,14 @@ export function SalaryPageContent({
   const [isPending, startTransition] = useTransition();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingSalary, setEditingSalary] = useState<SalaryData | null>(null);
+  const { isLoggedIn, openModal } = useLoginModal();
 
   const handleBarClick = (year: number) => {
+    if (!isLoggedIn) {
+      openModal();
+      return;
+    }
+
     const salary = salaries.find((s) => s.year === year);
     if (salary) {
       setEditingSalary(salary);
@@ -50,6 +57,11 @@ export function SalaryPageContent({
   };
 
   const handleAddCurrentYear = () => {
+    if (!isLoggedIn) {
+      openModal();
+      return;
+    }
+
     const currentYear = new Date().getFullYear();
     const existingSalary = salaries.find((s) => s.year === currentYear);
     if (existingSalary) {

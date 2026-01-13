@@ -6,7 +6,7 @@ import { getSession } from "@/shared/auth/getSession";
 export async function getPortfolios() {
   const session = await getSession();
   if (!session) {
-    throw new Error("Unauthorized");
+    return [];
   }
 
   const portfolios = await db.query.portfolio.findMany({
@@ -23,7 +23,7 @@ export async function getPortfolios() {
 export async function getPortfolioById(id: string) {
   const session = await getSession();
   if (!session) {
-    throw new Error("Unauthorized");
+    return null;
   }
 
   const result = await db.query.portfolio.findFirst({
@@ -38,7 +38,7 @@ export async function getPortfolioById(id: string) {
   }
 
   if (result.userId !== session.user.id) {
-    throw new Error("Forbidden");
+    return null;
   }
 
   return result;
