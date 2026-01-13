@@ -4,13 +4,12 @@ import { useState, useTransition } from "react";
 import { toast } from "sonner";
 import { Plus } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/shared/ui/card";
-import { Button } from "@/shared/ui/button";
 import { FiveYearSelector } from "./FiveYearSelector";
 import { SalaryChart } from "./SalaryChart";
 import { SalaryFormDialog } from "./SalaryFormDialog";
 import { SalaryStatsCards } from "./SalaryStatsCards";
 import { saveSalary } from "@/features/salary/server-functions/saveSalary";
-import { useLoginModal } from "@/shared/auth/useLoginModal";
+import { AuthButton } from "@/shared/auth/AuthButton";
 import type { SalaryData } from "@/features/salary/queries";
 
 interface SalaryPageContentProps {
@@ -33,14 +32,8 @@ export function SalaryPageContent({
   const [isPending, startTransition] = useTransition();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingSalary, setEditingSalary] = useState<SalaryData | null>(null);
-  const { isLoggedIn, openModal } = useLoginModal();
 
   const handleBarClick = (year: number) => {
-    if (!isLoggedIn) {
-      openModal();
-      return;
-    }
-
     const salary = salaries.find((s) => s.year === year);
     if (salary) {
       setEditingSalary(salary);
@@ -57,11 +50,6 @@ export function SalaryPageContent({
   };
 
   const handleAddCurrentYear = () => {
-    if (!isLoggedIn) {
-      openModal();
-      return;
-    }
-
     const currentYear = new Date().getFullYear();
     const existingSalary = salaries.find((s) => s.year === currentYear);
     if (existingSalary) {
@@ -114,10 +102,10 @@ export function SalaryPageContent({
           <SalaryChart data={salaries} onBarClick={handleBarClick} />
 
           <div className="flex justify-center pt-6">
-            <Button size="lg" className="gap-2" onClick={handleAddCurrentYear}>
+            <AuthButton size="lg" className="gap-2" onClick={handleAddCurrentYear}>
               <Plus className="h-5 w-5" />
               올해 연봉 입력하기
-            </Button>
+            </AuthButton>
           </div>
         </CardContent>
       </Card>

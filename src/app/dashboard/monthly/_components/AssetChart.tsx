@@ -53,7 +53,7 @@ interface AssetChartProps {
 
 export function AssetChart({ data, categoryList }: AssetChartProps) {
   const router = useRouter();
-  const { isLoggedIn, openModal } = useLoginModal();
+  const { requireAuth } = useLoginModal();
 
   const chartData = data.map((snapshot) => {
     const [, month] = snapshot.yearMonth.split("-");
@@ -79,18 +79,15 @@ export function AssetChart({ data, categoryList }: AssetChartProps) {
       <BarChart
         data={chartData}
         onClick={(clickData) => {
-          if (!isLoggedIn) {
-            openModal();
-            return;
-          }
-
-          const activeIndex = getActiveIndex(clickData);
-          if (activeIndex !== null) {
-            const item = chartData[activeIndex];
-            if (item) {
-              router.push(`/dashboard/monthly/assets/${item.yearMonth}`);
+          requireAuth(() => {
+            const activeIndex = getActiveIndex(clickData);
+            if (activeIndex !== null) {
+              const item = chartData[activeIndex];
+              if (item) {
+                router.push(`/dashboard/monthly/assets/${item.yearMonth}`);
+              }
             }
-          }
+          });
         }}
       >
         <CartesianGrid strokeDasharray="3 3" vertical={false} />

@@ -11,10 +11,22 @@ export function useLoginModal() {
   const openModal = useCallback(() => setIsOpen(true), [setIsOpen]);
   const closeModal = useCallback(() => setIsOpen(false), [setIsOpen]);
 
+  const requireAuth = useCallback(
+    (callback: () => void) => {
+      if (!isLoggedIn) {
+        openModal();
+        return;
+      }
+      callback();
+    },
+    [isLoggedIn, openModal]
+  );
+
   return {
     isOpen,
     isLoggedIn,
     openModal,
     closeModal,
+    requireAuth,
   };
 }

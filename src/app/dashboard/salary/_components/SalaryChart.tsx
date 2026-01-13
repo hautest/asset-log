@@ -4,6 +4,7 @@ import { ChartContainer, ChartTooltip } from "@/shared/ui/chart";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Cell } from "recharts";
 import type { SalaryData } from "@/features/salary/queries";
 import { formatCurrency } from "@/shared/utils/formatCurrency";
+import { useLoginModal } from "@/shared/auth/useLoginModal";
 
 function getYearFromClickData(data: unknown): number | null {
   if (typeof data !== "object" || data === null) {
@@ -62,6 +63,7 @@ interface SalaryChartProps {
 }
 
 export function SalaryChart({ data, onBarClick }: SalaryChartProps) {
+  const { requireAuth } = useLoginModal();
   const maxAmount = Math.max(...data.map((d) => d.amount), 50000000);
   const minBarHeight = maxAmount * 0.02;
 
@@ -84,10 +86,12 @@ export function SalaryChart({ data, onBarClick }: SalaryChartProps) {
       <BarChart
         data={chartData}
         onClick={(clickData) => {
-          const year = getYearFromClickData(clickData);
-          if (year) {
-            onBarClick(year);
-          }
+          requireAuth(() => {
+            const year = getYearFromClickData(clickData);
+            if (year) {
+              onBarClick(year);
+            }
+          });
         }}
       >
         <CartesianGrid strokeDasharray="3 3" vertical={false} />
