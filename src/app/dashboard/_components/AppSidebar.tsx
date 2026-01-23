@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
-import { BarChart3, Calendar, Banknote, User, LogOut, LogIn, PieChart, Target } from "lucide-react";
+import { BarChart3, Calendar, Banknote, User, LogOut, LogIn, PieChart, Target, MessageCircle } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -39,6 +39,11 @@ const MENU_ITEMS = [
     title: "목표 자산 계산기",
     url: "/dashboard/goal" as const,
     icon: Target,
+  },
+  {
+    title: "AI 어시스턴트",
+    url: "/dashboard/chat" as const,
+    icon: MessageCircle,
   },
 ];
 

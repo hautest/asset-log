@@ -29,7 +29,8 @@ export async function generateMetadata({
 
   return {
     title,
-    robots: { index: false, follow: false },
+    description: `${title} - 자산로그에서 월별 자산을 기록하고 관리하세요`,
+    robots: { index: true, follow: true },
   };
 }
 

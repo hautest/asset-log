@@ -220,6 +220,7 @@ export const userRelations = relations(user, ({ many }) => ({
   monthlySnapshots: many(monthlySnapshot),
   salaries: many(salary),
   portfolios: many(portfolio),
+  chatSessions: many(chatSession),
 }));
 
 // Salary Table
@@ -304,5 +305,58 @@ export const portfolioItemRelations = relations(portfolioItem, ({ one }) => ({
   portfolio: one(portfolio, {
     fields: [portfolioItem.portfolioId],
     references: [portfolio.id],
+  }),
+}));
+
+// Chat Tables
+
+export const chatSession = pgTable(
+  "chat_session",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    title: text("title").notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at")
+      .defaultNow()
+      .$onUpdate(() => new Date())
+      .notNull(),
+  },
+  (table) => [index("chatSession_userId_idx").on(table.userId)]
+);
+
+export const chatMessageRoleEnum = pgEnum("chat_message_role", [
+  "user",
+  "assistant",
+]);
+
+export const chatMessage = pgTable(
+  "chat_message",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    sessionId: uuid("session_id")
+      .notNull()
+      .references(() => chatSession.id, { onDelete: "cascade" }),
+    role: chatMessageRoleEnum("role").notNull(),
+    content: text("content").notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [index("chatMessage_sessionId_idx").on(table.sessionId)]
+);
+
+export const chatSessionRelations = relations(chatSession, ({ one, many }) => ({
+  user: one(user, {
+    fields: [chatSession.userId],
+    references: [user.id],
+  }),
+  messages: many(chatMessage),
+}));
+
+export const chatMessageRelations = relations(chatMessage, ({ one }) => ({
+  session: one(chatSession, {
+    fields: [chatMessage.sessionId],
+    references: [chatSession.id],
   }),
 }));

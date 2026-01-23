@@ -28,6 +28,7 @@ interface StockResult {
 interface PortfolioFormDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  onSuccess?: () => void;
   portfolio?: {
     id: string;
     name: string;
@@ -39,6 +40,7 @@ interface PortfolioFormDialogProps {
 export function PortfolioFormDialog({
   open,
   onOpenChange,
+  onSuccess,
   portfolio,
 }: PortfolioFormDialogProps) {
   const [name, setName] = useState("");
@@ -134,6 +136,7 @@ export function PortfolioFormDialog({
           items,
         });
         toast.success("포트폴리오가 수정되었습니다");
+        onSuccess?.();
       } else {
         await createPortfolio({
           name: name.trim(),
@@ -141,6 +144,7 @@ export function PortfolioFormDialog({
           items,
         });
         toast.success("포트폴리오가 생성되었습니다");
+        onSuccess?.();
       }
       onOpenChange(false);
     } catch (error) {

@@ -1,17 +1,22 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/shared/ui/card";
 import { Button } from "@/shared/ui/button";
 import { Label } from "@/shared/ui/label";
 import { DatePicker } from "@/shared/ui/date-picker";
-import { ArrowLeft, Pencil, Loader2, Activity } from "lucide-react";
+import { ArrowLeft, Pencil, Loader2, Activity, Sparkles } from "lucide-react";
 import { PortfolioFormDialog } from "../../_components/PortfolioFormDialog";
 import { analyzePortfolioAction } from "@/features/portfolio/server-functions/analyzePortfolio";
 import { toast } from "sonner";
 import { AnalysisResult } from "./AnalysisResult";
+import { AIAnalysisResult } from "./AIAnalysisResult";
 import type { PortfolioAnalysis } from "@/features/portfolio/analysis";
 import type { Portfolio } from "@/features/portfolio/types";
+import {
+  analyzeWithAI,
+  type AIAnalysisResult as AIAnalysisResultType,
+} from "@/features/portfolio/server-functions/analyzeWithAI";
 import { useRouter } from "next/navigation";
 
 interface PriceData {
@@ -38,8 +43,28 @@ export function PortfolioDetail({ portfolio }: PortfolioDetailProps) {
   const [endDate, setEndDate] = useState<Date | undefined>(getDefaultEndDate());
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysisData, setAnalysisData] = useState<AnalysisData | null>(null);
+  const [isAIAnalyzing, setIsAIAnalyzing] = useState(false);
+  const [aiAnalysisData, setAiAnalysisData] =
+    useState<AIAnalysisResultType | null>(null);
 
   const router = useRouter();
+  const isInitialMount = useRef(true);
+
+  // 기간 변경 시 AI 분석 초기화
+  useEffect(() => {
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      return;
+    }
+    setAiAnalysisData(null);
+  }, [startDate, endDate]);
+
+  // 포트폴리오 수정 완료 시 분석 초기화
+  const handleEditSuccess = () => {
+    setAnalysisData(null);
+    setAiAnalysisData(null);
+    router.refresh();
+  };
 
   const handleAnalyze = async () => {
     if (!startDate || !endDate) {
@@ -67,6 +92,31 @@ export function PortfolioDetail({ portfolio }: PortfolioDetailProps) {
       toast.error(message);
     } finally {
       setIsAnalyzing(false);
+    }
+  };
+
+  const handleAIAnalyze = async () => {
+    if (!analysisData || !startDate || !endDate) {
+      toast.error("먼저 백테스트 분석을 실행하세요");
+      return;
+    }
+
+    setIsAIAnalyzing(true);
+    try {
+      const result = await analyzeWithAI({
+        analysis: analysisData.analysis,
+        items: analysisData.items,
+        startDate: formatDateToString(startDate),
+        endDate: formatDateToString(endDate),
+      });
+      setAiAnalysisData(result);
+      toast.success("AI 분석이 완료되었습니다");
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : "AI 분석에 실패했습니다";
+      toast.error(message);
+    } finally {
+      setIsAIAnalyzing(false);
     }
   };
 
@@ -198,7 +248,34 @@ export function PortfolioDetail({ portfolio }: PortfolioDetailProps) {
             </div>
           </div>
 
-          {analysisData && <AnalysisResult data={analysisData} />}
+          {analysisData && (
+            <>
+              <AnalysisResult data={analysisData} />
+
+              <div className="mt-6 pt-6 border-t">
+                <Button
+                  onClick={handleAIAnalyze}
+                  disabled={isAIAnalyzing}
+                  variant="outline"
+                  className="w-full border-purple-300 text-purple-700 hover:bg-purple-50"
+                >
+                  {isAIAnalyzing ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      AI 분석 중...
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles className="mr-2 h-4 w-4" />
+                      AI로 포트폴리오 분석하기
+                    </>
+                  )}
+                </Button>
+              </div>
+
+              {aiAnalysisData && <AIAnalysisResult data={aiAnalysisData} />}
+            </>
+          )}
         </CardContent>
       </Card>
 

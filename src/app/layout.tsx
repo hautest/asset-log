@@ -8,7 +8,7 @@ import { AuthInitializer } from "@/shared/auth/AuthInitializer";
 import { LoginModal } from "@/shared/auth/LoginModal";
 import { LoginModalTrigger } from "@/shared/auth/LoginModalTrigger";
 
-const SITE_URL = "https://assetlog.kr";
+const SITE_URL = "https://asset-log.org";
 const SITE_NAME = "자산로그";
 const DEFAULT_DESCRIPTION =
   "마이데이터가 못 잡는 숨은 자산까지 포함한 전체 자산을 차트로 시각화. 전세 보증금, 코인, 해외 자산 등 모든 자산을 한눈에 관리하세요.";
