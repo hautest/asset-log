@@ -282,6 +282,7 @@ export function PortfolioDetail({ portfolio }: PortfolioDetailProps) {
       <PortfolioFormDialog
         open={editOpen}
         onOpenChange={setEditOpen}
+        onSuccess={handleEditSuccess}
         portfolio={{
           id: portfolio.id,
           name: portfolio.name,
