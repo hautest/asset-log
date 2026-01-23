@@ -6,12 +6,13 @@ import { HeroSection } from "./_components/HeroSection";
 import { FeaturesSection } from "./_components/FeaturesSection";
 import { StepsSection } from "./_components/StepsSection";
 import { BenefitsSection } from "./_components/BenefitsSection";
+import { AISection } from "./_components/AISection";
 import { SalarySection } from "./_components/SalarySection";
 import { PortfolioSection } from "./_components/PortfolioSection";
 import { CTASection } from "./_components/CTASection";
 import { LandingFooter } from "./_components/LandingFooter";
 
-const SITE_URL = "https://assetlog.kr";
+const SITE_URL = "https://asset-log.org";
 const PAGE_DESCRIPTION =
   "마이데이터가 못 잡는 숨은 자산까지 포함한 전체 자산을 차트로 시각화. 전세 보증금, 코인, 해외 자산 등 모든 자산을 한눈에 관리하세요.";
 
@@ -35,6 +36,8 @@ export default async function HomePage() {
       <StepsSection />
       <Separator />
       <BenefitsSection />
+      <Separator />
+      <AISection />
       <Separator />
       <SalarySection />
       <Separator />
